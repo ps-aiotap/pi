@@ -1,0 +1,113 @@
+﻿Group,Name,ITEM ID,Release,Prod Date,Status,Report Date,Redmine ID,Reporter,Priority,Release Timeline - Start,Release Timeline - End,Reccuring Issue,Kanban Status,Assigned To,Developer,TEAM,Tentative Prod Date,Dev Time,Client Name,Dev Done Date,QA Time,Days until Resolution,Bug Description,Sprints,Picture/Video,Estimated Hours,Release Version,Reported Version,Client Aging,Environment,Resolution,Last Updated,Hours to Resolve,Moved from Redmine,Item ID,Leakage RCA,Sanity Test Coverage,Automation Feasibility,Release Impact,monday Doc v2,High Priority,Automation Candidate,Within 30 days,Hotfix Date,Module,Dev RCA,Reported Month
+Incoming  Bugs,Feliciana - Bill.com duplicate transactions in multi distribution,PI-9878,,,New,2026-04-02,,Jeff Parton,High,,,,Backlog,Madhu Hotwani,Sourabh kale,Transformers,,,,,0 days 0 hours,When the attached transaction came in it duplicated both ledger amounts.  The transaction is from 3/30/26 in entity 601,,https://assetvantage.monday.com/protected_static/3096414/resources/2874749676/image.png,,,,2,,,"Shankar Kanase Apr 3, 2026 3:37 PM",0,No,11663499878,,,,,,,,,,,,,Mar-26
+Incoming  Bugs,Ruben - Widgets not populating,PI-8327,,,Feedback,2026-03-31,,Jeff Parton,High,,,,Backlog,Mihir Naryagol,Ravi Prakash,Code,,,,,0 days 0 hours,For user Andrew Ruben he is seeing widgets not populating in certain dashboards.  Please see the attached video.,,https://assetvantage.monday.com/protected_static/3096414/resources/2867628303/Screen Recording 2026-03-30 103837.mp4,,,,4,,,"Mihir Naryagol Apr 1, 2026 11:53 AM",0,No,11639608327,,,,,,,,,,,,,
+Incoming  Bugs,"Report Book : In PAR (beta), system is not adding or reducing the quantities. Whatever open quantities are appearing in the report, same appearing in closing as well.",PI-2260,,,New,2026-04-03,,Ashutosh Ranade,Critical,,,,Backlog,Gurunath Kale,Gurunath Kale,Product Team,,,,,0 days 0 hours,"Report Book : In PAR (beta), system is not adding or reducing the quantities. Whatever open quantities are appearing in the report, same appearing in closing as well.",,https://assetvantage.monday.com/protected_static/3096414/resources/2875798862/Par beta .jpg,,,,1,,,"Ravi Prakash Apr 3, 2026 1:00 PM",0,No,11667282260,,,,,,,,,,,,,
+Incoming  Bugs,Master > Chart of Accounts > Template - Delete,PI-9799,,,New,2026-04-03,,Dipika Suthar,,,,,Backlog,Gurunath Kale,Anil Chandran,Spartans,,,,,0 days 0 hours,I wanted to delete the template for Chart of accounts but in the system the delete option is not showing.,,,,,,1,,,"Ravi Prakash Apr 3, 2026 1:00 PM",0,Yes,11667399799,,,,,,,,,,,,,
+Incoming  Bugs,Luzerne - Missing Transactions from Feed Electra for Multiple Accounts,PI-0200,,,New,2026-04-03,,Aparna Agarwal,,,,,Backlog,Gurunath Kale,Sandip Valanju,Transformers,,,,,0 days 0 hours,"Hi Team,
+
+We are observing an issue in production where only a limited number of transactions are being displayed from Feed Electra, whereas the account statements reflect a significantly higher number of transactions.
+
+For reference, I have attached the account statements along with the corresponding feed transaction details.
+
+Could you please verify whether Electra is sharing the complete set of transaction data? If there is a gap from the provider’s end, request you to raise this with the feed provider for further investigation.
+
+Details:
+
+Entity ID: 1950
+Accounts: 6075, 9110, 9660
+
+Please let us know your findings at the earliest.",,,,,,1,,,"Anil Chandran Apr 3, 2026 6:51 PM",0,Yes,11668310200,,,,,,,,,,,,,
+Perfomance - Code Optimisation,Direct Equity : We are not able to add the de-merger transactions due to large transaction volume.,PI-6168,,,Optimization,2026-02-13,,Ashutosh Ranade,Critical,,,,Backlog,Gurunath Kale,Rushikesh Bhilare,Arjun,,806:15:20,,,0 days 0 hours,"Direct Equity : We are not able to add the de-merger transaction due to large transaction volume. When we save the de-merger transaction, it just showing as processing. 
+This is client specific issue. 
+
+URL : https://blueocean.assetvantage.com/
+Entity : Sanjiv Rangrass
+Account : Kotak Securities
+Security : ITC Ltd.
+Date : 6th Jan 2025",,,,,,36,,,"Rushikesh Bhilare Mar 24, 2026 5:07 PM",0,No,11268606168,,,,,,,,,,,,,
+Development Work,Ruben Morningstar g33 triple trxns,PI-4524,,,Fixing,2026-03-10,,Bryan Gulyas,High,,,,Backlog,Mihir Naryagol,Sandip Valanju,Transformers,,278:09:47,,,0 days 0 hours,client has found trxns for account G33 > 8733 are showing up 3 times. is this an AV or  Morningstar issue?,,,,,,19,,,"SUNNY MITTAL Mar 24, 2026 3:09 PM",0,No,11472714524,,,,,,,,,,,,,
+Development Work,Missing Mutual Fund Transactions & Audit Trail Gap,PI-0198,,,Feedback,2026-03-26,,Neha Rai,,,,,Backlog,Madhu Hotwani,Sahil Sonawane,Arjun,,127:19:51,,,0 days 0 hours,"Client LGT Securities reported the issue https://lgtsecurities.assetvantage.com/user/index/index/login
+ On 9 Mar 2026, the client recorded three mutual fund transactions under the entity Shirin Nazim Charania. Subsequently, all three transactions were found to be missing from the system without any visible deletion record. As a result, the client re-entered the same transactions on 12 Mar 2026.
+
+While the User Activity Report confirms that the transactions were successfully created on 9 Mar 2026, there is no corresponding audit trail indicating when, how, or by whom these transactions were deleted. This indicates a gap in system tracking and audit logging for transaction deletions.
+
+Supporting screenshots of the audit report confirming the original transaction entries on 9 Mar 2026 are attached.",,https://assetvantage.monday.com/protected_static/3096414/resources/2856015140/Screenshot 2026-03-23 123435.png,,,,7,,,"Sahil Sonawane Apr 2, 2026 3:22 PM",0,No,11599900198,,,,,,,,,,,,,
+Development Work,The ledger account showing blank for few cash entries,PI-8136,,,Fixing,2026-03-25,,Leena Mhatre,Critical,,,,Backlog,Gurunath Kale,Rushikesh Bhilare,Arjun,,111:59:51,,,0 days 0 hours,"The ledger account showing blank for few cash entries. This is highligted directly by client thus needs to be reviewed urgently. The transaction was posted from feed (auto sync/post).
+Snapshot and entity account details provided in mail attachment",,,,,,8,,,"SUNNY MITTAL Mar 31, 2026 1:19 PM",0,No,11590018136,,,,,,,,,,,,,
+Development Work,Gary Peters Bank Recon Withdrawal Reconcile,PI-8002,,,Fixing,2026-03-23,,Bryan Gulyas,High,,,,Backlog,Shreya Agrawal,Shreya Naresh Shelke,Transformers,,110:12:59,,,0 days 0 hours,"bank Recon is not working correctly for this account. if you select all the transaction to reconcile, the Deposits total goes to zero but the withdrawals stays at 167,311.83 so the Un-Reconciled Transaction number goes large negative. If you select individual withdrawal transactions, the total reduces, but then reverts when you select all. We aren't seeing this issue with other accounts so might be specific",,,,,,10,,,"SUNNY MITTAL Mar 31, 2026 3:06 PM",0,No,11572838002,,,,,,,,,,,,,
+Development Work,Eversource - Report Book Balance Sheet not producing accurate data,PI-1891,,,Fixing,2026-04-01,,Jeff Parton,Critical,,,,Backlog,,Ankita Valdor,SCOT,,77:42:38,,,0 days 0 hours,In the Family - Portfolio Activity dashboard the balance sheet is not running properly.  The values are incredibly low and do not reflect the data being pulled from the General Ledger.  The client needs to get reports out today. The group is Stayner Family and the report date is 3/31/26,,"https://assetvantage.monday.com/protected_static/3096414/resources/2871717930/image.png, https://assetvantage.monday.com/protected_static/3096414/resources/2871719796/image.png",,,,3,,,"SUNNY MITTAL Apr 1, 2026 11:36 PM",0,No,11653281891,,,,,,,,,,,,,
+QA Replicated,"Gain Report - Client was not able to generate the gain report at their end, but same is working at our end however, for us also it took more than 5 minutes to generate, expand and export the report",PI-0967,,,Ready for Dev,2026-03-16,,Ashutosh Ranade,Critical,,,,Backlog,Gurunath Kale,Sandip Valanju,Arjun,,,,,0 days 0 hours,"Client was not able to generate the gain report at their end, but same is working at our end however, for us also it took more than 5 minutes to generate, expand and export the report. Following are the filters.
+
+URL : https://blueocean.assetvantage.com/
+Entity : Santara Capital And Management Consultants LLP
+Report period : Since inception till 28th Feb 2026
+Realized gain report with Grandfathered LTCG.",,,,,,15,,,"Rajesh Rane Mar 20, 2026 12:08 PM",0,No,11512680967,,,,,,,,,,,,,
+QA Replicated,Acadia Custodian Recon Security No Data,PI-6587,,,Ready for Dev,2026-03-12,,Bryan Gulyas,High,,,,Backlog,Madhu Hotwani,Pooja Raut,Transformers,,,,,0 days 0 hours,"No data/transactions are returning for the securities when selecting them in Custodian Recon. There is a 3/12-3/12 date range in the left corner also, please review",,,,,,17,,,"Sandip Valanju Mar 20, 2026 11:40 AM",0,No,11491546587,,,,,,,,,,,,,
+QA Replicated,Issue in Returns while viewing in Report Book > Benchmark,PI-9220,,,Ready for Dev,2026-03-17,,Mayur Salvi,,,,,Backlog,Mihir Naryagol,Avishkar Harishchandra Kurkute,Avengers,,,,,0 days 0 hours,"Hi Team,
+While viewing the returns in report book > benchmark we are seeing a difference in returns for different system.
+
+For RMC ( platform) - The Nifty500 & BSE 150 Midcap returns are coming identical ( MTD, QTD, YTD & FTY)
+
+Whereas when we run the same widget in India Training & Training the returns varies.
+
+RMC Link - https://rmc.assetvantage.com/user/index/index/login",,"https://assetvantage.monday.com/protected_static/3096414/resources/2834068022/Training.jpg, https://assetvantage.monday.com/protected_static/3096414/resources/2834068007/image (8).png, https://assetvantage.monday.com/protected_static/3096414/resources/2834068043/India Training.jpg",,,,14,,,"Ravi Prakash Apr 3, 2026 3:51 PM",0,No,11524549220,,,,,,,,,,,,,
+QA Replicated,"Client - Dalton, Facing slowness in report book and some widget are going blank even after loading all the widget from cache memory.",PI-3673,,,New,2026-03-24,,Madhuram Joshi,High,,,,Backlog,Ravi Prakash,Kunal Baranwal,Code,,,,,0 days 0 hours,"Client - Dalton, Facing slowness in report book and some widget are going blank even after loading all the widget from cache memory.",,https://assetvantage.monday.com/protected_static/3096414/resources/2849389949/Report book SS.png,,,,9,,,"Mayur Salvi Mar 27, 2026 3:26 PM",0,No,11578473673,,,,,,,,,,,,,
+QA Replicated,TJCNY  - Cost Issue,PI-8535,,,Ready for Dev,2026-03-20,,Jeff Parton,High,,,,Backlog,Madhu Hotwani,Rushikesh Ghorpade,Avengers,,,,,0 days 0 hours,"In entity W209 there is a difference in cost for the Johnson and Johnson security between the Balance Sheet and the Open Lot Report. Also, the Wealth Register matches the Balance Sheet. In the attached you can see that the Open Lot Report are missing the yellow highlighted lots.",,https://assetvantage.monday.com/protected_static/3096414/resources/2842160536/Missing Cost W209.xlsx,,,,11,,,"Pushpendu Sharma Mar 26, 2026 10:12 AM",0,No,11551598535,,,,,,,,,,,,,
+QA Replicated,NextWorld - Auto Sync - txns coming in from PCR feeds are going in Unidentified,PI-6393,,,Ready for Dev,2026-03-20,,Saurabh Bhattacharya,Critical,,,,Backlog,Gurunath Kale,Rushikesh Bhilare,Arjun,,,,,0 days 0 hours,,,,,,,11,,,"Gurunath Kale Mar 25, 2026 12:44 PM",0,No,11555326393,,,,,,,,,,,,,
+QA Replicated,Altium Transaction Sync Account Select Icon Check Box Auto Sync,PI-1635,,,Ready for Dev,2026-03-25,,Bryan Gulyas,High,,,,Backlog,Mihir Naryagol,Sandip Valanju,Transformers,,,,,0 days 0 hours,"There is a bug in Transaction Sync where if you select the 'Check All' box next to Entity in the Sync Account screen, the system selects all including accounts grayed out for auto sync, then if you run Start Sync, the system will sync auto sync account duplicating transactions. Also deselecting the check all box doesn't uncheck the accounts after syncing",,,,,,8,,,"Mihir Naryagol Mar 26, 2026 1:02 PM",0,No,11592911635,,,,,,,,,,,,,
+QA Replicated,Tectonic Custom Account Mapping Withdrawal/Deposit,PI-6479,,,Ready for Dev,2026-03-27,,Bryan Gulyas,High,,,,Backlog,Mihir Naryagol,Sandip Valanju,Transformers,,,,,0 days 0 hours,How does this Custom Account Mapping exist as it is a contradiction? i tried to delete it but it seems to be a system mapping? please get rid of it for all accounts,,,,,,6,,,"Mihir Naryagol Mar 30, 2026 12:23 PM",0,No,11613766479,,,,,,,,,,,,,
+QA Replicated,Difference in Closing Market Value & Opening Value when fetching report in WR & Wealth Register Report PAR for period,PI-7123,,,Ready for Dev,2026-03-27,,Mayur Salvi,Critical,,,,Backlog,Rushikesh Ghorpade,Rushikesh Ghorpade,Avengers,,,,,0 days 0 hours,"Hi Team,
+We have identified discrepancies between the Market Value on March 31, 2025 (Wealth Register) and the Opening Value on April 01, 2025 (Portfolio Activity Report) for George Alexander’s portfolio.
+
+For the below mutual funds we are facing the issue
+1. Nippon India Pharma Fund(G)
+2. UTI Nifty 200 Momentum 30 Index Fund
+3. SBI Magnum Midcap Fund-Reg(G
+4. Aditya Birla Sun Life Business Cycle Fund
+5. Kotak US Specific Equity Passive FOF
+
+Link - https://hcmuthoot.assetvantage.in/
+Client - George Alexander",,"https://assetvantage.monday.com/protected_static/3096414/resources/2858916870/Par George.jpg, https://assetvantage.monday.com/protected_static/3096414/resources/2858916893/Wealth Register George.jpg",,,,6,,,"Ashutosh Ranade Mar 31, 2026 6:19 PM",0,No,11610177123,,,,,,,,,,,,,
+QA Replicated,Incorrect holding cost | Mutual Fund,PI-3973,,,Ready for Dev,2026-03-18,,Neha Rai,,,,,Backlog,Madhu Hotwani,Rushikesh Ghorpade,Avengers,,,,,0 days 0 hours,"In https://lgtsecurities.assetvantage.com/
+Entity: Myron Wealth Management Private Limited As on: 23-Feb-2026, Grouped by Asset-Class( Fixed Income) and Holdings (Nippon India ETF Liquid BeES) in INR holding cost is showing negative however it is actually not a negative holding for client right now.",,https://assetvantage.monday.com/protected_static/3096414/resources/2837112628/image (8).png,,,,13,,,"Ravi Prakash Apr 3, 2026 12:47 PM",0,No,11534283973,,,,,,,,,,,,,
+QA Replicated,Rockdale Profit Share Change,PI-1216,,,Ready for Dev,2026-04-02,,Bryan Gulyas,High,,,,Backlog,Gurunath Kale,Anil Chandran,Spartans,,,,,0 days 0 hours,Client found an 11/1/25 Profit Share value changed from original entry to today. they claim they did not make any changes but report values changed from when run after entry to today.  S&N value original entry was 7.393 but changed to 7.392. Entity Audit History doesn't track changes to Profit Share and System user audit history doesn't seem to track this either. Are we able to view logs/database(s) to see who/when the change occurred?,,,,,,2,,,"Gurunath Kale Apr 2, 2026 6:15 PM",0,No,11655501216,,,,,,,,,,,,,
+QA Replicated,KKP - Deleted Security Gets Auto-Recreated After Arch Setup,PI-2017,,,Ready for Dev,2026-03-31,,Aparna Agarwal,Critical,,,,Backlog,Madhu Hotwani,pradip thakre,Transformers,,,,,0 days 0 hours,"Description:
+After setting up Arch, all securities are automatically created by the system. However, I am encountering an issue where a security that was previously deleted is being recreated without any manual action.
+
+Reference:
+
+URL: https://kkpgroup.assetvantage.com/
+
+Affected Securities:
+
+RREF III-U Debt Direct Domestic, L.P. — Security Identifier: 55458
+RREF III-U Property Direct Domestic, L.P. — Security Identifier: 55457
+
+Details:
+
+The securities were originally auto-created during the initial Arch setup.
+I deleted the security on 18th March 2026.
+I also updated the security identifiers for the relevant securities to prevent duplication.
+Despite this, on 31st March 2026, I observed that the same securities had been auto-created again.
+
+Expected Behavior:
+Once securities are deleted, they should not be recreated automatically, especially after updating the security identifiers.
+
+Actual Behavior:
+The system is automatically recreating the deleted securities, resulting in duplicate entries.
+
+Impact:
+This causes inconsistencies in portfolio data during transaction sync and requires repeated manual cleanup.
+
+Request:
+Please investigate why the system is re-creating deleted securities and ensure that once removed (and identifiers updated), they are not auto-generated again.",,,,,,4,,,"Madhu Hotwani Apr 3, 2026 10:26 AM",0,Yes,11637992017,,,,,,,,,,,,,
+QA Replicated,"Taxation master - Changes for Indian Listed Commodity funds effective from July, 2024",PI-8283,,,Ready for Dev,2026-04-03,,Sanjana Thakur,,,,,Backlog,Gurunath Kale,Sandip Valanju,Arjun,,,,,0 days 0 hours,"he duration between Nippon India ETF Gold BeES and HDFC Gold Exchange Traded Fund are more than a year, but the Gains are reflected as STCG instead of LTCG
+https://hclgtindia1.assetvantage.in/",,"https://assetvantage.monday.com/protected_static/3096414/resources/2875742102/taxation (1).csv, https://assetvantage.monday.com/protected_static/3096414/resources/2875742586/Nippon Gold.png, https://assetvantage.monday.com/protected_static/3096414/resources/2875742585/HDFC gold.png",,,,1,,,"Anil Chandran Apr 3, 2026 3:00 PM",0,No,11667158283,,,,,,,,,,,,,
+QA Replicated,Ruben Unitized Fund Transaction Sync Security ID,PI-9273,,,Ready for Dev,2026-04-03,,Bryan Gulyas,High,,,,Backlog,Gurunath Kale,Sandip Valanju,Transformers,,,,,0 days 0 hours,"Client found an issue where a transaction is showing green, but if you select and process, it doesn't. The Description and Security Name Identifier has an extra '\' character not in the feed file which seems to be causing an issue. if you edit the transaction, the Security Name field is blank",,,,,,1,,,"Anil Chandran Apr 3, 2026 2:59 PM",0,No,11664979273,,,,,,,,,,,,,
+On Hold/Reopened - Dev Team,DE Module - Transfer In & Out transactions from a demerger entry is not removed even if the demerger transaction is deleted.,PI-9058,v2.53.9.0 - Feb _12th_Release,2025-02-12,Reopened,2025-01-27,,"Vaishakh Sudhir, Ashutosh Ranade, Neha Rai",High,,,,Backlog,Rushikesh Ghorpade,Rushikesh Bhilare,Arjun,,64:12:26,,,8 days 16 hours,We are facing an issue in Direct equity module where the transfer in a& transfer out transactions generated from the demerger entry is not deleted even if the user has deleted the demerger transaction from the system. We have faced this issue is some client system like Patni family office & LGT1. As a work around we are now deleting these transactions with the DM but we need this issue to be resolved permanently. Currently we do not have any client's system snapshot.,,,,,,13,,,"Rajesh Rane Mar 2, 2026 6:00 PM",64.21,No,8327919058,,,,,,,,,,,,,
+On Hold/Reopened - Dev Team,Balance sheet - Cost of sold out equities can be seen on balance sheet.,PI-3962,v2.53.33.0 - August_14_Release_hotfix,2025-08-14,Feedback,2024-07-26,,"Vaishakh Sudhir, John Bezgam, Madhuram Joshi, Kevin Pagliaro",High,28/08/24,31/08/24,,Released,Rushikesh Ghorpade,Shital Thorat,SCOT,,06:41:17,,,0 days 6 hours,"For client Feliciana,
+We have noticed that for some equities which have already been sold out they are still visible on balance sheet with some cost. Ideally the sold out positions should not be displayed on BS. Also if we check on wealth register the positions are not available there.
+
+Attaching the snapshot.
+
+This issue was raised by John Bezgam.",,"https://assetvantage.monday.com/protected_static/3096414/resources/1583992499/Comcast.PNG, https://assetvantage.monday.com/protected_static/3096414/resources/1583992509/Align.PNG",,,,275,,,"Anil Chandran Apr 2, 2026 4:56 PM",6.69,No,7101643962,,,,,,,,,,,,,
