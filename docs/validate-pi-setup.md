@@ -4,7 +4,7 @@ Use this after changes to `pi/` or to confirm a clone is correct.
 
 ## 1. Folder layout
 
-From the repository root, these paths should exist:
+From the **workspace root** (the directory that **contains** `pi/` as a subdirectory, often alongside `controller/`, `dashboard/`, etc.), these paths should exist:
 
 - `pi/input/` and `pi/input/processed/`
 - `pi/input/urls/` (client URL CSVs for intake)
@@ -26,6 +26,12 @@ test -f pi/specs/pi.csv && test -f pi/specs/README.md && \
 test -d pi/input/processed && test -d pi/skills/pi-intake-impact-fix-spec && \
 echo "OK: core paths present"
 ```
+
+### Workspace vs `pi/` vs application clones
+
+- The **workspace root** may have **no** `.git`; it is simply the folder that contains **`pi/`** and the application trees you search during PI work.
+- **`pi/`** is its **own** repository (typically **GitHub**) for specs, inputs, skills, and user-manual content. PI skills **exclude** `pi/` from the mandatory “refresh all application repos” step unless you explicitly want to update the PI repo.
+- **Application source** is usually **multiple Bitbucket clones** (e.g. `controller/`, `dashboard/`). Before running intake, test-plan, code-fix, or test-implement skills, **fetch and integrate each clone** under the workspace root **except** paths under `pi/` — see **Before you start** / **Preconditions** in `pi/skills/*/SKILL.md`.
 
 ## 2. Column reference file
 
@@ -68,7 +74,7 @@ This validates behavior, not only files on disk.
 2. In Cursor, open the intake skill (e.g. `@pi/skills/pi-intake-impact-fix-spec/SKILL.md` or symlinked Agent Skill) and ask it to process that file for the single row.
 3. **Expect:**  
    - New or updated `pi/specs/<ItemId>.md` (and optionally `pi/impact/<ItemId>.md`), including **Client environment URL** (lookup under `pi/input/urls/`) and **Suggested assignment** (team + leader from `pi/input/team/`).  
-   - No edits outside `pi/` (spot-check `git status` or diff).
+   - No edits outside `pi/` (spot-check `git status` in the relevant application clone(s) or your diff tool).
 4. Confirm with the agent that the run is complete, then **move** `pi/input/smoke.csv` → `pi/input/processed/smoke.csv` (or let the agent do it per skill).
 5. Optionally confirm a line was appended to `pi/docs/process-log.md`.
 

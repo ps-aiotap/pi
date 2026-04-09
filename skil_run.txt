@@ -1,0 +1,7 @@
+Do not modify any files under @pi/skills/ while running these skills.
+Do not change the input path; always use exactly @pi/input/Book2.csv.
+Run the skill @pi/skills/pi-intake-impact-fix-spec/SKILL.md @pi/input/Book2.csv
+Run the skill @pi/skills/pi-legacy-php-hypothesis/SKILL.md @pi/input/Book2.csv
+Run the skill @pi/skills/pi-code-fix/SKILL.md @pi/input/Book2.csv
+Run the skill @pi/skills/pi-test-implement/SKILL.md @pi/input/Book2.csv
+Run the skill @pi/skills/pi-test-plan/SKILL.md @pi/input/Book2.csv

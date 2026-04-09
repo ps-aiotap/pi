@@ -44,7 +44,7 @@ def load_url_catalog() -> dict[str, str]:
     return out
 
 
-def hcuat_from_catalog(url: str) -> str:
+def hc_uat_from_catalog(url: str) -> str:
     p = urlparse(url)
     host = p.hostname or ""
     parts = host.split(".")
@@ -52,7 +52,15 @@ def hcuat_from_catalog(url: str) -> str:
         return url
     tenant = parts[0]
     rest = ".".join(parts[1:])
-    new_host = f"hcuat{tenant}.{rest}"
+    if tenant.startswith("hcuat"):
+        first = "hc" + tenant[5:]
+    elif tenant.startswith("hc"):
+        first = tenant
+    else:
+        first = "hc" + tenant
+    if rest.endswith("assetvantage.com"):
+        rest = rest[: -len("assetvantage.com")] + "assetvantage.in"
+    new_host = f"{first}.{rest}" if rest else first
     scheme = p.scheme or "https"
     return f"{scheme}://{new_host}/"
 
@@ -91,7 +99,7 @@ TENANT_LOOKUP: dict[str, tuple[str, str, str | None]] = {
 
 
 def resolve_url(item_id: str, catalog: dict[str, str]) -> tuple[str, str, str]:
-    """Returns (markdown body, hcuat_or_empty, kind)."""
+    """Returns (markdown body, hc_uat_or_empty, kind)."""
     if item_id not in TENANT_LOOKUP:
         return (
             "- **Match type:** None\n- **Rationale:** No tenant mapping for this batch entry.\n- **HC UAT base URL:** Not determined.\n",
@@ -101,7 +109,7 @@ def resolve_url(item_id: str, catalog: dict[str, str]) -> tuple[str, str, str]:
     kind, rationale, key = TENANT_LOOKUP[item_id]
     if key and norm(key) in catalog:
         url = catalog[norm(key)]
-        h = hcuat_from_catalog(url)
+        h = hc_uat_from_catalog(url)
         body = (
             f"- **Match type:** {kind}\n"
             f"- **Rationale:** {rationale}\n"
@@ -184,7 +192,7 @@ def write_spec(row: dict[str, str], catalog: dict[str, str]) -> None:
     roster_team, leader = TEAM_MAP.get(team_csv, ("SCOT Misc", "Anil Chandran"))
     assigned = row.get("Assigned To", "")
     developer = row.get("Developer", "")
-    env_section, _hcuat, _ = resolve_url(item_id, catalog)
+    env_section, _hc_uat, _ = resolve_url(item_id, catalog)
 
     g = row.get("Group") or ""
     meta_rows = [
