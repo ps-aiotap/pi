@@ -1,7 +1,53 @@
 Do not modify any files under @pi/skills/ while running these skills.
-Do not change the input path; always use exactly @pi/input/Book2.csv.
-Run the skill @pi/skills/pi-intake-impact-fix-spec/SKILL.md @pi/input/Book2.csv
-Run the skill @pi/skills/pi-legacy-php-hypothesis/SKILL.md @pi/input/Book2.csv
-Run the skill @pi/skills/pi-code-fix/SKILL.md @pi/input/Book2.csv
-Run the skill @pi/skills/pi-test-implement/SKILL.md @pi/input/Book2.csv
-Run the skill @pi/skills/pi-test-plan/SKILL.md @pi/input/Book2.csv
+Status/columns: follow pi/docs/jira-pi-board-status.md (PB board 774; BA = Change Request).
+
+# --- Input (choose one) ---
+# Single PI:  <PB-KEY>           e.g. PB-2888
+# Batch:       multiple keys     e.g. PB-2888 PB-1072 PB-2865  (run the block below once per key, in order)
+# Legacy batch: pi/input/Book2.csv only when rows have no PB-* key (map Item ID → PB-* when possible)
+
+Do not use glob for evidence archive existence checks; use direct ls on pi/input/pi-evidence/.
+
+# --- Per PI (repeat for each PB-* key in a batch) ---
+
+# 1. Evidence from Jira attachments (no export)
+Run the skill @pi/skills/pi-fetch-evidence/SKILL.md <PB-KEY>
+# cd jira && python -m scripts.jira_automation fetch-evidence <PB-KEY>
+
+# 2. Evidence analysis
+Run the skill @pi/skills/pi-evidence-analysis/SKILL.md <PB-KEY>
+
+# 3. Intake + impact analysis + fix spec (writes pi/specs/<PB-KEY>.md, optional pi/impact/<PB-KEY>.md)
+Run the skill @pi/skills/pi-intake-impact-fix-spec/SKILL.md <PB-KEY>
+
+# 4. Similar PIs (Jira search — learning + sibling blast-radius)
+Run the skill @pi/skills/pi-similar-pis/SKILL.md <PB-KEY>
+# cd jira && python -m scripts.jira_automation similar-pis <PB-KEY>
+
+# 4b. Business impact + domain primer (OPTIONAL — default ON; see pi/docs/pi-pipeline-config.md)
+Run the skill @pi/skills/pi-business-impact/SKILL.md <PB-KEY>
+# Set business_impact: false in pi/docs/pi-pipeline-config.md to skip, or say "skip business impact" in chat
+
+# 5. Cross-cutting impact matrix + special cases
+Run the skill @pi/skills/pi-special-cases/SKILL.md <PB-KEY>
+# uses pi/docs/cross-cutting-impact-dimensions.md + pi/docs/pi-special-cases.md
+
+# 6. Legacy PHP vs lambda hypothesis (when reporting/calc paths involved)
+Run the skill @pi/skills/pi-legacy-php-hypothesis/SKILL.md <PB-KEY>
+
+# 7. Manual reproduction steps in spec (self-contained ## Reproduction / symptoms)
+Run the skill @pi/skills/pi-spec-manual-reproduction/SKILL.md <PB-KEY>
+
+# 8. Test plan (before code fix / implement)
+Run the skill @pi/skills/pi-test-plan/SKILL.md <PB-KEY>
+
+# 9. Code fix (application repos — man-in-the-loop)
+Run the skill @pi/skills/pi-code-fix/SKILL.md <PB-KEY>
+
+# 10. Test implement
+Run the skill @pi/skills/pi-test-implement/SKILL.md <PB-KEY>
+
+# --- Optional (on demand) — toggles in pi/docs/pi-pipeline-config.md ---
+# business_impact: true  → step 4b above (set false to disable pipeline-wide)
+# rca_human_enhancement: false → uncomment below when BA/human notes exist
+# Run the skill @pi/skills/pi-rca-human-enhancement/SKILL.md <PB-KEY>

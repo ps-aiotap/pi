@@ -48,6 +48,37 @@ When this case applies, include explicit verification for:
 
 Also include a manual check for "newly visible historical entries" and expected handling path (informational vs correction workflow).
 
+## Case: transfer amount on PAR/PPS (multi-vehicle)
+
+### Behavior / risk
+
+- PAR, PPS, WR, and related performance reports compute transfer-related amounts from txn fields (`transfernetamount`, `transfernavperunit`, transfer-in/out types, often txn types 45/46).
+- Logic is duplicated per asset vehicle (Mutual Fund, Direct Equity, Fixed Income, Derivatives) in legacy calculation classes and may also appear in lambda report paths.
+- A fix scoped to **one vehicle only** (e.g. Mutual Fund) often leaves the same defect on **Direct Equity** and others.
+
+### Triage guidance
+
+- When the PI names one vehicle (e.g. MF) but symptoms are transfer/PAR/PPS/WR/gains, treat **sibling vehicles as in-scope until disproved** with code evidence.
+- Compare txn screen transfer price/amount to report output for the **same txn id** on each in-scope vehicle.
+- Distinguish product logic defect from stale report parameters or client data.
+
+### Spec guidance (`pi/specs/{ItemId}.md`)
+
+When this case applies, include:
+
+- **`## Cross-cutting impact matrix`** — per `pi/docs/cross-cutting-impact-dimensions.md`; at minimum **Asset vehicles** and **Stack (PHP vs lambda)** rows.
+- **Impact / blast radius** — list each vehicle with `in-scope` / `out-of-scope` / `unknown` and file-path rationale.
+- **Acceptance criteria** — one bullet per `in-scope` vehicle (and per report surface if export is triggered).
+- **Open questions** — if only one vehicle was tested in evidence, note required DE/FI/Deriv checks.
+
+### Test plan guidance (`pi/test-plans/{ItemId}.md`)
+
+When this case applies, include explicit regression for:
+
+- same transfer txn type on each vehicle marked `in-scope` in the matrix,
+- PAR (or named report) vs txn master for transfer amount/price,
+- optional: PDF/Excel export if **Report surfaces** row is `in-scope` or `unknown`.
+
 ## How to maintain this file
 
 - Add one section per recurring PI nuance with the same structure:

@@ -1,10 +1,10 @@
 ---
 name: pi-intake-impact-fix-spec
 description: >-
-  Reads PI CSVs from pi/input (schema from pi/specs/pi.csv), looks up client URLs in
-  pi/input/urls (exact + fuzzy client match), suggests team and leader from pi/input/team, searches the repo and
-  pi/user_manual/ (Asset Vantage end-user guides) for expected behavior and terminology, writes impact analysis
-  and a detailed fix specification under pi/ only. Man-in-the-loop phase; does not change application code or tests.
+  Intakes PI rows from Jira (live API), Jira/Monday CSV, or pi/input (schema from pi/specs/pi.csv).
+  Uses Jira board column as status per pi/docs/jira-pi-board-status.md (BA = Change Request).
+  Looks up client URLs, suggests team from pi/input/team, searches repo and pi/user_manual/, writes
+  fix specs under pi/ only. Man-in-the-loop; no application code or test changes.
 ---
 
 # PI intake, impact analysis, and fix specification
@@ -22,6 +22,13 @@ This skill lives under `pi/skills/` so all PI workflow assets stay inside `pi/`.
 - Use only direct repository paths explicitly defined in this skill (for example `pi/input/*.csv`, `pi/input/urls/*.csv`, `pi/input/team/*`, `pi/user_manual/`, `docs/PI/...`, and application-code paths discovered by search).
 - In specs, cite evidence as concrete file paths (and line anchors for code where applicable), not folder aliases.
 
+### No placeholder or speculative artifacts (mandatory)
+
+- **Evidence archives:** For **`PB-*`**, run **`pi-fetch-evidence`** (or confirm zip already exists via direct `ls`) before citing `pi/input/pi-evidence/<ItemId>.zip`. Never write that path unless the file **exists** after a real check. If no attachments on Jira, state that fact; do not use "if present" or invented paths.
+- **Metadata:** If a CSV field is empty, either **omit** the row from the metadata table or state factually that the column is empty in the export—do not use `(not provided)`, `(blank)`, **TBD**, or **N/A** as generic stand-ins.
+- **URLs:** Do not fabricate HC UAT links; follow **Client URL lookup** and leave tenant unresolved when there is no confident match.
+- **Sections:** Do not paste boilerplate investigation checklists, fake acceptance criteria, or generic "proposed fix" bullets that repeat every PI; every sentence must tie to this row’s narrative, module, or cited code/doc paths.
+
 ### PI special cases context (mandatory)
 
 Before processing any row, read `pi/docs/pi-special-cases.md` and apply any relevant nuance to:
@@ -30,6 +37,17 @@ Before processing any row, read `pi/docs/pi-special-cases.md` and apply any rele
 - root-cause framing,
 - acceptance criteria,
 - and open questions for humans.
+
+Also skim `pi/docs/cross-cutting-impact-dimensions.md` so intake seeds the **Cross-cutting impact matrix** for dimensions whose triggers match the PI row (full resolution is **`pi-special-cases`**).
+
+### Jira PI board status (mandatory)
+
+Read **`pi/docs/jira-pi-board-status.md`** before interpreting **Status** on any row.
+
+- **Status = board column:** On project **PB** board **774**, each kanban column maps to one Jira status; moving columns updates status.
+- Prefer the **board column label** in spec metadata (e.g. INCOMING BUGS, IN QA, CLOSED). If the source only has the Jira status name, map using that doc’s table.
+- **BA column = Change Request:** Engineering on the PI is complete; the PI will close and feature request(s) may follow. **Do not** call this “Done” in spec prose even if Jira still stores status **Done** behind the BA column until workflow is fixed.
+- **Issue keys:** `PB-*` (Jira) or `PI-*` (legacy Monday); use the key from the row for `{ItemId}` filenames.
 
 ### Source code refresh (Bitbucket application clones)
 
@@ -63,8 +81,12 @@ Do not hardcode Bitbucket URLs; use each clone’s configured remote (typically 
 | Impact notes (optional) | `pi/impact/{ItemId}.md` |
 | What was done (optional log) | Append a short dated entry to `pi/docs/process-log.md` (file, rows / ItemIds) |
 | Product behavior (end users) | `pi/user_manual/` — see **User manual (product context)** below |
+| Jira board columns / status semantics | `pi/docs/jira-pi-board-status.md` |
+| Similar PI search (Jira) | `pi/similar/{ItemId}.md` — see **`pi-similar-pis`** skill |
+| Evidence zip (Jira attachments) | `pi/input/pi-evidence/{ItemId}.zip` — see **`pi-fetch-evidence`** skill |
+| Business impact (optional) | `pi/business-impact/{ItemId}.md` — see **`pi-business-impact`**; skip if `pi/docs/pi-pipeline-config.md` has `business_impact: false` |
 
-Use a safe filename token for `{ItemId}` (e.g. `PI-2148`): take the value from **`Item ID`**, or if empty **`ITEM ID`**, stripping characters unsafe in paths.
+Use a safe filename token for `{ItemId}` (e.g. `PI-2148`, `PB-2912`): **`Issue key`** / **`PI ID`** from Jira when present; else **`Item ID`** / **`ITEM ID`**, stripping characters unsafe in paths.
 
 ## User manual (product context)
 
@@ -106,22 +128,25 @@ Use **`pi/user_manual/`** alongside code and `docs/` so specs reflect **document
 5. **Disambiguation — Report Book vs look-through engine:** If the PI is **MF / Look Through / LT Market Cap / underlying holdings** (data missing or wrong in the look-through output, Value Research / scheme ISIN linkage, tourbillon lookthrough queries), weight **Avengers performance** (report/calculation path) and optionally **Transformers Ingestion** (feed file → DB). Do **not** default to **Code UI** solely because the menu path says “Report Book” when symptoms point at look-through data resolution.
 6. **Always** include a **Suggested assignment** subsection in `pi/specs/{ItemId}.md`: **Team**, **Leader**, **Rationale** (PI fields + code area + roster citation). If the CSV already has `Assigned To` / `Developer`, mention whether it aligns with the suggestion or conflicts.
 
-## CSV rules
+## PI row input (Jira API preferred; CSV legacy)
 
-1. **Headers** must match the names in `pi/specs/pi.csv` (same columns; order may differ—map by header name).
-2. **Row order:** process data rows top to bottom as they appear in the file.
-3. **Selecting which file:** use the path the user specifies; if none, use one file under `pi/input/` (if several, prefer the one the user names next, or ask—do not silently merge multiple files).
+1. **Preferred:** Live Jira issue key(s) on **PB** (e.g. `PB-2888`) when `jira/.env` is available. Fetch fields via REST API; map **status** to board column per **`pi/docs/jira-pi-board-status.md`**. **No Jira CSV export required.**
+2. **Evidence:** Attachments on the same Jira issue — use **`pi-fetch-evidence`** to build `pi/input/pi-evidence/{ItemId}.zip` before **`pi-evidence-analysis`**. Do not require a separate evidence export.
+3. **CSV (legacy):** Monday `Book2.csv` or old Jira CSV only when there is no `PB-*` key or API is unavailable. Map columns to canonical fields.
+4. **Row order (CSV only):** top to bottom as in the file.
+5. **Selecting input:** use `PB-*` key(s) the user specifies; legacy CSV only when explicitly requested.
 
 ## What to do
 
-1. Read the chosen CSV from `pi/input/`.
+1. Load the PI row(s) from the chosen input (CSV path, Jira fetch, or explicit keys in chat).
 2. For each row the user wants handled (or each row in order, if they said “process the file”):
-   - Build a short PI summary from `Name`, `Bug Description`, `Module`, `Status`, `Priority`, `Environment`, **`Client Name`**, and other useful columns.
+   - Build a short PI summary from title/name, description, `Module`, **status/column** (per Jira board doc), `Priority`, `Environment`, **`Client Name`**, and other useful fields.
    - **Client URL:** run the **Client URL lookup** steps using `pi/input/urls/`.
    - **Team / leader:** run the **Team and leader suggestion** steps using `pi/input/team/`.
+   - **Similar PIs (Jira):** when `{ItemId}` is a **`PB-*`** key, run **`pi/skills/pi-similar-pis/SKILL.md`** (command: `cd jira && python -m scripts.jira_automation similar-pis {ItemId}`). Embed **`## Similar PIs (Jira)`** in the spec (summary table + link to `pi/similar/{ItemId}.md`). If no PB key or Jira unavailable, note *Similar PI search skipped — {reason}*.
    - Search the codebase, `docs/`, and **`pi/user_manual/`** (see **User manual**) for implementation plus **documented** behavior. Cite code as **`path:line`**; cite guides as **`pi/user_manual/<file>.md`**.
    - Write **`pi/impact/{ItemId}.md`** when a separate impact write-up helps; otherwise fold impact into the fix spec.
-  - Write **`pi/specs/{ItemId}.md`** with: metadata (key columns), **Client environment URL**, **Suggested assignment** (team + leader + rationale), summary, reproduction, **competing hypotheses** with evidence, **fast elimination plan**, **fix options** at behavior level (not a full unsolicited patch), blast radius, risks/rollback, acceptance criteria, open questions.
+  - Write **`pi/specs/{ItemId}.md`** with: metadata (key columns), **Client environment URL**, **Suggested assignment** (team + leader + rationale), summary, reproduction, **competing hypotheses** with evidence, **fast elimination plan**, **fix options** at behavior level (not a full unsolicited patch), **Cross-cutting impact matrix** (seed per `pi/docs/cross-cutting-impact-dimensions.md`), blast radius, risks/rollback, acceptance criteria, open questions.
 3. **Do not** edit files outside `pi/` (no application code or test changes in this phase).
 4. When the user confirms the **entire** input file is done for this pass, **move** that CSV to `pi/input/processed/`.
 5. Optionally **append** a brief dated line to **`pi/docs/process-log.md`** (input filename, `ItemId`s handled).
@@ -174,7 +199,7 @@ Each check must include:
 ## Fix spec section checklist
 
 - Title and `ItemId`
-- Metadata table (from CSV)
+- Metadata table (from row / Jira / CSV), including **board column** or mapped status per `pi/docs/jira-pi-board-status.md`
 - **Client environment URL** — **HC UAT** URL as a **clickable Markdown link**: `**HC UAT URL:** [https://…](https://…)` (`hc` + tenant on `.assetvantage.in`; see Client URL lookup); primary vs fuzzy rationale; **no** `Source:` lines or raw CSV rows; **no** backticks around the URL (that disables linking)
 - **Suggested assignment** — team name, leader (from `pi/input/team/`), rationale; note alignment/conflict with CSV assignees if any
 - Summary
@@ -182,6 +207,23 @@ Each check must include:
 - Root cause with **>=3 competing hypotheses** (why likely + code/doc evidence + quick disprover + confidence), concrete and non-generic
 - **Fast elimination plan** (5/10/15 minute checks with branch rules)
 - **Fix options** (Option A minimal patch, Option B structural fix; risks and rollback note for each)
-- Impact / blast radius
+- **Cross-cutting impact matrix** — one row per dimension whose triggers match (from `pi/docs/cross-cutting-impact-dimensions.md`); use `unknown` until **pi-special-cases** resolves; omit rows with no trigger match
+- **Similar PIs (Jira)** — when `pi/similar/{ItemId}.md` exists: summary table (score, band, key, why); link to full list; call out any **Strong** match on a different asset class
+- Impact / blast radius (narrative; reference matrix `in-scope` rows)
 - Acceptance criteria
 - Open questions
+
+## Cross-cutting impact matrix (intake seed)
+
+When writing the initial spec:
+
+1. Match PI **Name**, **Bug Description**, and **Module** against each dimension’s **Triggers** in `pi/docs/cross-cutting-impact-dimensions.md`.
+2. Add **`## Cross-cutting impact matrix`** using the template in that doc (only matching dimensions).
+3. Set every seeded row to **`unknown`** unless intake repo search already proves `in-scope` or `out-of-scope` (cite path).
+4. Do not replace this section with generic blast-radius text; **pi-special-cases** completes the matrix before code fix.
+
+## Relationship to other PI skills
+
+- **`pi-similar-pis`** runs during intake for **`PB-*`** keys (or immediately after); writes `pi/similar/{ItemId}.md`.
+- **`pi-business-impact`** (optional, default on via `pi/docs/pi-pipeline-config.md`) runs after similar-PIs; writes `pi/business-impact/{ItemId}.md` and **`## Business impact (for engineering)`** in the spec — do not duplicate that section during intake.
+- **`pi-special-cases`** runs after intake and before **pi-legacy-php-hypothesis** / **pi-code-fix**; it reads similar-PI and optional business-impact results and resolves the matrix and expands acceptance criteria and test plans.

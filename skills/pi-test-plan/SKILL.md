@@ -22,10 +22,20 @@ Stored under `pi/skills/`. For Cursor Agent Skill discovery, symlink or copy to 
 - Use only direct paths defined in this skill and discovered by repository search (for example `pi/specs/{ItemId}.md`, `pi/impact/{ItemId}.md`, `pi/user_manual/...`, concrete app/test paths).
 - In test plans, cite explicit files/routes/symbols; avoid folder-alias references.
 
+### No placeholder rows or paths (mandatory)
+
+- Do **not** write **TBD**, **TODO**, "(if present)", or cite test/evidence paths unless they exist after a workspace search.
+- **Automation mapping:** Replace gaps with concrete outcomes of search (for example "no `*.spec.ts` under `dashboard/src/app/foo` after `rg`")—never lazy filler.
+- Do not reference `pi/input/pi-evidence/*.zip` unless that file exists for the PI.
+
 ### PI special cases context (mandatory)
 
 Before drafting or updating `pi/test-plans/{ItemId}.md`, read `pi/docs/pi-special-cases.md`.
 If a listed case applies, include explicit regression and verification rows for that nuance and note any client data-correction handling expected by the spec.
+
+### Jira board status (mandatory)
+
+Read **`pi/docs/jira-pi-board-status.md`**. Use **board column** as workflow status. If the PI is in **BA (Change Request)**, acceptance criteria should cover **PI defect verification** and closure—not full delivery of follow-on feature requests unless the spec explicitly includes them.
 
 ### Source code refresh (Bitbucket application clones)
 
@@ -65,7 +75,7 @@ Do not treat the user manual as a substitute for the mandatory **repository sear
 
 ## Instructions
 
-1. Read the fix spec for `{ItemId}`. Extract acceptance criteria, **Root cause** / **Suggested assignment** paths, and **Impact / blast radius**. Pull any **user manual** citations already listed in the spec; extend with **`pi/user_manual/`** search if gaps remain for repro or regression flows.
+1. Read the fix spec for `{ItemId}`. Extract acceptance criteria, **Root cause** / **Suggested assignment** paths, **`## Cross-cutting impact matrix`**, and **Impact / blast radius**. Every matrix row marked **`in-scope`** must have at least one regression or verify-the-fix case (or an explicit open question if blocked). Pull any **user manual** citations already listed in the spec; extend with **`pi/user_manual/`** search if gaps remain for repro or regression flows.
 2. **Repository search (mandatory):** Before finalizing the plan, search for automated coverage and conventions, for example:
    - `controller/unittest/` and `**/*Test*.php` under `controller/`
    - `dashboard/**/*.spec.ts` and `dashboard/karma.conf.js` (Karma + Jasmine)
@@ -75,14 +85,14 @@ Do not treat the user manual as a substitute for the mandatory **repository sear
    - **Code hotspots:** Table or bullets tying the PI to controllers, services, SQL, or UI entry points (start from spec + batch **Code hotspots (seed)** if present).
    - **Verify the fix:** cases that directly prove the PI is resolved (steps, data, expected result).
    - **Regression:** Each row must cite a **Code / UX anchor** (file::symbol, route, or screen), not generic “smoke module” text.
-   - **Adjacent:** Only flows justified by impact analysis or shared code.
+   - **Adjacent:** Only flows justified by impact analysis, **`## Cross-cutting impact matrix`** `in-scope` rows, or shared code.
    - **Automation mapping:** A table (or explicit “manual-only” with rationale). **Do not** leave the word **TBD** as the answer when the spec names `controller/` or other repo paths — either list matching tests/globs or state that no tests reference those paths after the search.
 4. If the file still has the batch **Draft (batch-generated)** callout, remove it once regression and automation sections meet the rules above.
 5. Do not write or edit executable test code here—that belongs to the `pi-test-implement` skill later.
 
 ## Test plan section checklist
 
-- Scope and references (link to `pi/specs/{ItemId}.md`; list relevant **`pi/user_manual/*.md`** when they define expected behavior for manual cases). If you paste the **HC UAT** URL from the spec, keep the spec’s **markdown link** syntax so it stays clickable.
+- Scope and references (link to `pi/specs/{ItemId}.md`; summarize **`## Cross-cutting impact matrix`** `in-scope` dimensions; list relevant **`pi/user_manual/*.md`** when they define expected behavior for manual cases). If you paste the **HC UAT** URL from the spec, keep the spec’s **markdown link** syntax so it stays clickable.
 - Code hotspots (spec- and repo-grounded)
 - Environment / data prerequisites
 - Test cases with steps and expected results

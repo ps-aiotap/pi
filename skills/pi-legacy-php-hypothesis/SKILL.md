@@ -8,6 +8,10 @@ description: >-
 
 # PI legacy PHP hypothesis skill
 
+## Jira board status
+
+Read **`pi/docs/jira-pi-board-status.md`** when the PI row or spec includes workflow position. **BA = Change Request** (engineering complete on the PI; not “Done” in narrative).
+
 ## When to use
 
 Use this skill when any of the following are true:
@@ -27,6 +31,10 @@ Produce **at least 3 competing hypotheses**. Each hypothesis must include:
 - **Confidence** (`high`, `medium`, `low`).
 
 Do not output generic placeholders ("needs investigation", "manual check", "triage required").
+
+### Paths and artifacts (mandatory)
+
+- Cite `controller/...` and other paths only after confirming they exist in the workspace or are returned by search. Do not invent file paths as "likely" hotspots without a locate step.
 
 ## Legacy PHP hypothesis patterns
 

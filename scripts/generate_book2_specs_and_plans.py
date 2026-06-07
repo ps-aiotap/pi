@@ -6,95 +6,15 @@ import csv
 import re
 from pathlib import Path
 
-from pi_hypothesis_overrides import TAILORED, competing_markdown, fast_plan_markdown
-
 # Repo folder that contains input/, specs/, test-plans/ (the `pi/` tree).
 ROOT = Path(__file__).resolve().parents[1]
 INPUT_CSV = ROOT / "input" / "Book2.csv"
 URL_DIR = ROOT / "input" / "urls"
+EVIDENCE_ZIP_DIR = ROOT / "input" / "pi-evidence"
 SPECS = ROOT / "specs"
 PLANS = ROOT / "test-plans"
 USER_MANUAL_DIR = ROOT / "user_manual"
 WORKSPACE_ROOT = ROOT.parent
-
-# Code / UX anchors (seed from repo search; refine per PI)
-HOTSPOTS: dict[str, str] = {
-    "PI-9878": """- `pi/user_manual/billpay_integration_with_bill.com.md` — Bill.com / Billpay flows.
-- `controller/app/common/transaction/` — ledger posting paths for partner-sourced transactions.
-- Search: `rg -n "bill" controller/app` for Bill.com–related handlers.""",
-    "PI-8327": """- `dashboard/src/app/asset-vantage/dashboard/` — widget load and data binding.
-- `dashboard/src/app/test/component/dashboard.component.spec.ts` — dashboard shell tests.
-- `dashboard/karma.conf.js` — Karma/Jasmine entry.""",
-    "PI-2260": """- `dashboard/src/app/asset-vantage/report-book/` — Report Book UI.
-- `pi/user_manual/setting_up_user_dashboard_access_to_the_report_book_.md` — access and navigation context.""",
-    "PI-9799": """- `controller/app/modules/masters/controllers/IndexController.php` — Chart of Accounts / masters actions.
-- `pi/user_manual/` — Chart of Accounts theme (see `pi/user_manual/README.md` index).""",
-    "PI-0200": """- `controller/app/modules/masters/controllers/IndexController.php` — `GetelectraTransaction`, Electra feed name checks (see grep `Electra`).
-- `controller/public/js/wealth.js` — `importElectraFeed` and related Electra UI.
-- `controller/app/library/etcetera/Constants.php` — `ELECTRAURL` / Electra API base.""",
-    "PI-6168": """- `controller/app/common/transaction/DirectEquityTransaction.php` — de-merger and related DE flows.
-- `pi/user_manual/README.md` — Direct equity / corporate actions themes.""",
-    "PI-4524": """- `controller/app/modules/investments/` — Morningstar / feed transaction ingestion (search `morningstar`, `G33`).
-- `av_v3_lambda/` — feed/sync lambdas if this tenant uses API pipeline.""",
-    "PI-0198": """- `controller/app/modules/settings/` — audit and user activity (`Auditreport`, `UseractivityController`).
-- `controller/app/common/transaction/MutualFundTransaction.php` — MF persistence layer.
-- `pi/user_manual/` — transaction entry and audit reports (operational reports theme).""",
-    "PI-8136": """- `controller/app/common/transaction/LedgerTransaction.php` / feed posting — ledger line population from feed.
-- `controller/app/common/transaction/BaseFeedMappingTransaction.php` — feed-to-ledger mapping.""",
-    "PI-8002": """- `controller/app/modules/wealth/controllers/AccountreconciliationController.php` — bank reconciliation.
-- `controller/app/common/report/ReconciliationReport.php` — reconciliation totals logic.""",
-    "PI-1891": """- `balancesheet/` — balance sheet engine (sibling repo).
-- `dashboard/src/app/asset-vantage/report-book/` — Portfolio Activity / Report Book presentation.
-- `controller/app/modules/reports/` — report data APIs.""",
-    "PI-0967": """- `controller/app/modules/reports/controllers/IndexController.php` — report generation endpoints.
-- Search: `rg -l "gain" controller/app/modules/reports` — realized / LTCG report paths.""",
-    "PI-6587": """- `controller/app/modules/wealth/controllers/ReconciliationController.php` — custodian reconciliation.
-- `controller/public/js/wealth.js` — recon UI (large file; search `recon`).""",
-    "PI-9220": """- `av-edge-api/app/routes/alpha_wrt_benchmark/` — benchmark / alpha vs benchmark (recent churn on `master`).
-- `dashboard/src/app/asset-vantage/dashboard/widget/` — benchmark widgets.""",
-    "PI-3673": """- `dashboard/src/app/asset-vantage/report-book/` — Report Book.
-- `pi/user_manual/how_to_clear_cache_from_the_browser.md` — client-side cache guidance (symptom overlap).""",
-    "PI-8535": """- `controller/app/modules/reports/` — Open Lot / holdings cost reports.
-- Search: `rg -l "open.?lot" controller` (case-insensitive).""",
-    "PI-6393": """- `pcr/` — PCR feed pipeline (sibling repo).
-- `controller/app/common/transaction/` — unidentified / sync posting for feeds.""",
-    "PI-1635": """- `dashboard/src/app/asset-vantage/dashboard/widget/widget-charts/sync-treeGrid/` — sync account selection UI.
-- Search: `rg -l "sync" dashboard/src/app/asset-vantage/dashboard` — transaction sync screens.""",
-    "PI-6479": """- `controller/app/common/transaction/Feedmapping/` — custom account mapping.
-- `controller/app/modules/masters/controllers/IndexController.php` — account/feed master maintenance.""",
-    "PI-4426": """- `controller/app/common/transaction/AccountTransaction.php` — `copyMappingsToAccounts` (~6184+), `feedmappingdetails` / `iscopy` paths (~5852+).
-- `controller/app/modules/masters/views/index/account/defaultaccountlist.phtml` — account mapping UI (search copy / mapping).
-- `pi/user_manual/how_to_perform_custom_account_mapping.md` — documented flow.""",
-    "PI-7123": """- `balancesheet/` / `controller/app/modules/reports/` — WR vs PAR valuation continuity.
-- `av_v3_lambda/` — performance/position APIs if used for PAR.""",
-    "PI-3973": """- `controller/app/modules/wealth/` — holdings / wealth register presentation.
-- Search: `rg -l "holding.?cost" controller` (case-insensitive).""",
-    "PI-1216": """- `controller/app/modules/partnership/` or `controller/app/common/` — profit share / partnership allocations (search `profit`).
-- `controller/app/modules/settings/models/Auditreport.php` — audit coverage gaps vs. entity history.""",
-    "PI-2017": """- Search: `rg -l "arch" controller/app av_v3_lambda` — Arch security auto-create paths.
-- `controller/app/modules/masters/` — security master lifecycle.""",
-    "PI-8283": """- `controller/app/common/calculation/` — taxation / holding period for listed instruments.
-- `pi/user_manual/README.md` — taxation / gains themes.""",
-    "PI-9273": """- `controller/app/common/transaction/Feedmapping/BaseFeedMappingTransaction.php` — feed field normalization.
-- Transformers ingestion — security identifier parsing (escape/backslash handling).""",
-    "PI-9058": """- `controller/app/common/transaction/DirectEquityTransaction.php` — demerger-generated transfer in/out.
-- Deletion cascades for generated child transactions.""",
-    "PI-3962": """- `balancesheet/` — sold-out positions on balance sheet.
-- `controller/app/modules/reports/` — BS vs wealth register consistency.""",
-}
-
-USER_MANUAL: dict[str, str] = {
-    "PI-9878": "`pi/user_manual/billpay_integration_with_bill.com.md`, `pi/user_manual/bill_–_accounts_payable_partner_feature.md`",
-    "PI-8327": "`pi/user_manual/setting_up_user_dashboard_access_to_the_report_book_.md` (dashboards), report book widgets index",
-    "PI-2260": "`pi/user_manual/README.md` → Report book, widgets & charts",
-    "PI-9799": "`pi/user_manual/README.md` → Chart of accounts",
-    "PI-0200": "`pi/user_manual/README.md` → Feeds, statements & custodians",
-    "PI-8002": "`pi/user_manual/README.md` → Feeds, statements & custodians; bank/cash operational guides as applicable",
-    "PI-1891": "`pi/user_manual/README.md` → Report book & General ledger",
-    "PI-1635": "`pi/user_manual/README.md` → Feeds, statements & custodians",
-    "PI-3673": "`pi/user_manual/how_to_clear_cache_from_the_browser.md`, report book theme",
-    "PI-8283": "Taxation / gains guides under `pi/user_manual/README.md`",
-}
 
 # Memoize expensive full-tree scans (one scan per distinct token set across the batch).
 _HOTSPOT_CACHE: dict[tuple[str, ...], list[str]] = {}
@@ -141,6 +61,10 @@ STOPWORDS = {
     "like",
     "team",
     "positions",
+    "system",  # avoids fuzzy match to unrelated *globalsystem* tenants when narrative says "the system"
+    "securities",
+    "investment",
+    "investments",
 }
 
 
@@ -250,12 +174,8 @@ def tokenize(text: str) -> set[str]:
     return {w for w in words if w not in STOPWORDS}
 
 
-def discover_manual_guides(iid: str, module: str, name: str, bug: str, limit: int = 3) -> list[str]:
+def discover_manual_guides(module: str, name: str, bug: str, limit: int = 3) -> list[str]:
     """Rank guides by token overlap with filename + content."""
-    if iid in USER_MANUAL:
-        # Preserve curated mapping first when present.
-        return []
-
     query_tokens = tokenize(f"{module} {name} {bug}")
     if not query_tokens or not USER_MANUAL_DIR.exists():
         return []
@@ -285,137 +205,104 @@ def discover_manual_guides(iid: str, module: str, name: str, bug: str, limit: in
     return [rel for _, rel in ranked[:limit]]
 
 
-def hypothesis_line(module: str, name: str, bug: str) -> str | None:
-    """Return a concrete hypothesis when the PI text suggests one; otherwise omit (no generic filler)."""
-    text = f"{module} {name} {bug}".lower()
-    if "processing" in text or "stuck" in text or "save" in text:
-        return (
-            "Likely long-running or blocked transaction-processing path for this workflow "
-            "(queue/job completion, validation gate, or post-save recalculation)."
+def _strip_ticks(pathish: str) -> str:
+    return (pathish or "").strip().strip("`")
+
+
+def _token_hits_for_path(rel_path: str, tokens: set[str]) -> set[str]:
+    rel = _strip_ticks(rel_path)
+    if not rel:
+        return set()
+    p = WORKSPACE_ROOT / rel
+    if not p.exists() or not p.is_file():
+        return set()
+    try:
+        text = p.read_text(encoding="utf-8", errors="replace").lower()
+    except OSError:
+        return set()
+    return {tok for tok in tokens if tok in text}
+
+
+def competing_markdown(hypo_list: list[dict[str, str]]) -> str:
+    parts: list[str] = []
+    for i, h in enumerate(hypo_list):
+        parts.extend(
+            [
+                f"- **H{i + 1}: {h['title']}**",
+                f"  - Why likely: {h['why']}",
+                f"  - Code evidence: {h['code']}",
+                f"  - Product-doc evidence: `{h['doc'].strip('`')}`",
+                f"  - Quick disprover: {h['disprover']}",
+                f"  - Confidence: **{h['confidence']}**",
+            ]
         )
-    if "not matching" in text or "mismatch" in text or "difference" in text:
-        return (
-            "Likely valuation/report parity gap: differing date basis, filter scope, "
-            "or source table between compared reports."
-        )
-    if "no position" in text or "position" in text:
-        return (
-            "Likely position-resolution gap: upstream holdings not materialized for the report date "
-            "or UI/report query applying an unintended filter."
-        )
-    if "feed" in text or "import" in text or "electra" in text or "morningstar" in text:
-        return (
-            "Likely ingestion/mapping issue where provider payload fields are not normalized "
-            "to AV transaction/security expectations."
-        )
-    return None
+    return "\n".join(parts)
 
 
-def competing_hypotheses(module: str, name: str, bug: str, hotspots: list[str], guides: list[str]) -> list[dict[str, str]]:
-    text = f"{module} {name} {bug}".lower()
-    hot = hotspots[0] if hotspots else "`(no code match found)`"
-    guide = guides[0] if guides else "`pi/user_manual/README.md`"
-
-    if "processing" in text or "stuck" in text or "save" in text:
-        return [
-            {
-                "title": "Async completion path stalls after save",
-                "why": "Symptom reports transaction stuck at processing after save.",
-                "code": hot,
-                "doc": guide,
-                "disprover": "Check job/queue state for the transaction; if completion event exists and status still pending, reject this hypothesis.",
-                "confidence": "high",
-            },
-            {
-                "title": "Validation gate blocks post-save transition",
-                "why": "Workflow accepts input but does not finalize transaction state.",
-                "code": hot,
-                "doc": guide,
-                "disprover": "Replay with same payload while logging validation outcomes; no failed guard means reject.",
-                "confidence": "medium",
-            },
-        ]
-    if "not matching" in text or "mismatch" in text or "difference" in text:
-        return [
-            {
-                "title": "As-on date basis differs across compared reports",
-                "why": "PI explicitly mentions expected closing value date mismatch.",
-                "code": hot,
-                "doc": guide,
-                "disprover": "Compare generated SQL/filter parameters for both reports on same run; identical date basis rejects this.",
-                "confidence": "high",
-            },
-            {
-                "title": "Report aggregation filter mismatch",
-                "why": "Values diverge despite same business context.",
-                "code": hot,
-                "doc": guide,
-                "disprover": "Run both queries with identical entity/account/security filters; parity rejects this.",
-                "confidence": "medium",
-            },
-        ]
-    if "no position" in text or "position" in text:
-        return [
-            {
-                "title": "Holdings snapshot missing for report date",
-                "why": "Output says no position despite expected holdings.",
-                "code": hot,
-                "doc": guide,
-                "disprover": "Query holdings snapshot table for entity/account/date; row present rejects this.",
-                "confidence": "high",
-            },
-            {
-                "title": "UI/report filter excludes valid positions",
-                "why": "No-position symptom can come from join/filter conditions.",
-                "code": hot,
-                "doc": guide,
-                "disprover": "Execute backend response without UI filters; if positions appear, this is likely true.",
-                "confidence": "medium",
-            },
-        ]
-    return [
-        {
-            "title": "Request-to-persistence mapping mismatch",
-            "why": "Behavior deviates from expected workflow with no explicit processing error.",
-            "code": hot,
-            "doc": guide,
-            "disprover": "Capture request payload and persisted row for same action; one-to-one match rejects this.",
-            "confidence": "medium",
-        },
-        {
-            "title": "Persistence-to-report/render transformation gap",
-            "why": "Stored data may be correct but reported/rendered state diverges.",
-            "code": hot,
-            "doc": guide,
-            "disprover": "Compare persisted values against API/report payload for same entity/date; parity rejects this.",
-            "confidence": "medium",
-        },
-    ]
+def fast_plan_markdown(items: list[str]) -> str:
+    return "\n".join(f"- {c}" for c in items)
 
 
-def pad_hypotheses_three(
-    hypotheses: list[dict[str, str]], hot: str, guide: str
+def evidence_competing_hypotheses(
+    module: str, name: str, bug: str, hotspots: list[str], guides: list[str]
 ) -> list[dict[str, str]]:
-    """Intake skill requires 2–3 competing hypotheses; pad to three when branches return two."""
-    if len(hypotheses) >= 3:
-        return hypotheses
-    out = list(hypotheses)
-    out.append(
-        {
-            "title": "Master data, configuration, or tenant-specific override",
-            "why": "Same build behaves elsewhere; client flags, COA, or security masters may alter filters and joins.",
-            "code": hot,
-            "doc": guide,
-            "disprover": "Reproduce on a neutral training tenant with minimal data; if the issue disappears, compare tenant config and masters.",
-            "confidence": "low",
-        }
-    )
-    return out
+    """Generate hypotheses strictly from token overlap in discovered code + manual files."""
+    query_tokens = tokenize(f"{module} {name} {bug}")
+    if not query_tokens:
+        return []
+
+    code_hits_by_file: dict[str, set[str]] = {}
+    for hp in hotspots:
+        hits = _token_hits_for_path(hp, query_tokens)
+        if hits:
+            code_hits_by_file[_strip_ticks(hp)] = hits
+
+    doc_hits_by_file: dict[str, set[str]] = {}
+    for gp in guides:
+        hits = _token_hits_for_path(gp, query_tokens)
+        if hits:
+            doc_hits_by_file[_strip_ticks(gp)] = hits
+
+    if not code_hits_by_file or not doc_hits_by_file:
+        return []
+
+    code_tokens: set[str] = set().union(*code_hits_by_file.values())
+    doc_tokens: set[str] = set().union(*doc_hits_by_file.values())
+    common = sorted(code_tokens & doc_tokens, key=lambda t: (-len(t), t))
+    if not common:
+        return []
+
+    hypotheses: list[dict[str, str]] = []
+    for tok in common[:3]:
+        code_file = next((p for p, hs in code_hits_by_file.items() if tok in hs), list(code_hits_by_file.keys())[0])
+        doc_file = next((p for p, hs in doc_hits_by_file.items() if tok in hs), list(doc_hits_by_file.keys())[0])
+        hypotheses.append(
+            {
+                "title": f"Behavior around '{tok}' may diverge from documented flow",
+                "why": (
+                    f"Token '{tok}' appears in PI narrative and is present in both matched code and user-manual sources."
+                ),
+                "code": f"`{code_file}`",
+                "doc": f"`{doc_file}`",
+                "disprover": (
+                    f"Trace the '{tok}' path end-to-end for one failing and one passing case; "
+                    "if execution and output are identical, reject this hypothesis."
+                ),
+                "confidence": "evidence-based (token overlap)",
+            }
+        )
+    return hypotheses
 
 
 def fast_elimination_plan(hypotheses: list[dict[str, str]]) -> list[str]:
-    h1 = hypotheses[0]["title"] if hypotheses else "H1"
-    h2 = hypotheses[1]["title"] if len(hypotheses) > 1 else "H2"
+    if not hypotheses:
+        return [
+            "**Check 1 (5 min):** Validate the PI can be reproduced and capture exact request/response payload.",
+            "**Check 2 (10 min):** Expand code/manual search tokens from the PI narrative and regenerate evidence links.",
+            "**Check 3 (15 min):** If still no overlap evidence, mark root cause as unresolved and require manual triage.",
+        ]
+    h1 = hypotheses[0]["title"]
+    h2 = hypotheses[1]["title"] if len(hypotheses) > 1 else hypotheses[0]["title"]
     return [
         f"**Check 1 (5 min):** Capture failing request and immediate response. If payload/response already inconsistent, likely **{h1}**; else continue.",
         f"**Check 2 (10 min):** Verify persisted rows for same entity/account/date. If persistence is correct but API/report output differs, likely **{h2}**; else likely **{h1}**.",
@@ -631,7 +518,16 @@ def escape_md_cell(s: str) -> str:
     return (s or "").replace("|", "\\|").replace("\n", " ")
 
 
+def doc_key(row: dict) -> str:
+    """Prefer PI ID for file naming; fallback to Item ID."""
+    pi = (row.get("PI ID") or "").strip()
+    if pi:
+        return pi
+    return (row.get("ITEM ID") or row.get("Item ID") or "").strip()
+
+
 def spec_md(row: dict, clients: list[tuple[str, str, str]]) -> str:
+    did = doc_key(row)
     iid = (row.get("ITEM ID") or row.get("Item ID") or "").strip()
     name = row.get("Name", "").strip()
     bug = narrative_text(row)
@@ -656,60 +552,34 @@ def spec_md(row: dict, clients: list[tuple[str, str, str]]) -> str:
     if dev:
         assign_note = f"CSV lists **Developer** `{dev}` and **Assigned To** `{assigned}`; compare with suggested squad below."
 
-    discovered_guides = discover_manual_guides(iid, module, name, bug)
+    discovered_guides = discover_manual_guides(module, name, bug)
     discovered_hotspots = discover_code_hotspots(module, name, bug)
-    if iid in USER_MANUAL:
-        um = USER_MANUAL[iid]
-    elif discovered_guides:
-        um = ", ".join(f"`{p}`" for p in discovered_guides)
-    else:
-        um = "`pi/user_manual/README.md` — search by **Module** / keywords from this PI."
-    hotspots = HOTSPOTS.get(iid, "- *(Run `rg` in `controller/`, `dashboard/`, sibling repos from bug keywords.)*")
-    if iid not in HOTSPOTS and discovered_hotspots:
-        hotspots = "\n".join(f"- {p}" for p in discovered_hotspots)
-    guide_paths = re.findall(r"`([^`]+)`", um)
-    hot0 = discovered_hotspots[0] if discovered_hotspots else "`(no code match found)`"
-    guide0 = guide_paths[0] if guide_paths else "pi/user_manual/README.md"
-    tailored = TAILORED.get(iid)
-    if tailored:
-        primary_override = tailored.get("primary")
-        if primary_override is not None:
-            hypothesis_bullet = (
-                f"- **Hypothesis:** {primary_override}\n" if primary_override else ""
-            )
-        else:
-            primary_hypo = hypothesis_line(module, name, bug)
-            hypothesis_bullet = f"- **Hypothesis:** {primary_hypo}\n" if primary_hypo else ""
-        hypo_md = competing_markdown(tailored["competing"])
-        fast_checks = fast_plan_markdown(tailored["fast_plan"])
-    else:
-        primary_hypo = hypothesis_line(module, name, bug)
-        hypothesis_bullet = f"- **Hypothesis:** {primary_hypo}\n" if primary_hypo else ""
-        hypo_list = pad_hypotheses_three(
-            competing_hypotheses(module, name, bug, discovered_hotspots, guide_paths),
-            hot0,
-            guide0,
+    um = ", ".join(f"`{p}`" for p in discovered_guides) if discovered_guides else "- *(No manual guide match from current PI text.)*"
+    hotspots = "\n".join(f"- {p}" for p in discovered_hotspots) if discovered_hotspots else "- *(No code hotspot match from current PI text.)*"
+    repro_text = bug if bug else "*(No description in export.)*"
+    status_value = row.get("Status", "").strip().lower()
+    group_value = row.get("Group", "").strip().lower()
+    if "closed" in status_value or "released" in status_value or "closed" in group_value:
+        status_note = (
+            "Item appears closed/released in source export; use this spec for RCA traceability and regression checks."
         )
-        hypo_md = "\n".join(
-            "\n".join(
-                [
-                    f"- **H{i + 1}: {h['title']}**",
-                    f"  - Why likely: {h['why']}",
-                    f"  - Code evidence: {h['code']}",
-                    f"  - Product-doc evidence: `{h['doc'].strip('`')}`",
-                    f"  - Quick disprover: {h['disprover']}",
-                    f"  - Confidence: **{h['confidence']}**",
-                ]
-            )
-            for i, h in enumerate(hypo_list)
+    else:
+        status_note = (
+            "Item appears active in source export; use this spec to drive live triage and implementation."
         )
-        fast_checks = "\n".join(f"- {c}" for c in fast_elimination_plan(hypo_list))
-    options_md = "\n".join(
-        f"- **{o['name']}**\n  - Approach: {o['approach']}\n  - Risk: {o['risk']}\n  - Rollback: {o['rollback']}"
-        for o in fix_options(module, name, bug)
-    )
 
-    return f"""# {iid}: {name}
+    evidence_lines: list[str] = []
+    analysis_path = ROOT / "evidence-analysis" / f"{did}.md"
+    if analysis_path.is_file():
+        evidence_lines.append(f"- Source analysis: `pi/evidence-analysis/{did}.md`")
+    zip_path = EVIDENCE_ZIP_DIR / f"{did}.zip"
+    if zip_path.is_file():
+        evidence_lines.append(f"- Evidence archive: `pi/input/pi-evidence/{did}.zip`")
+    evidence_block = ""
+    if evidence_lines:
+        evidence_block = "## Evidence files\n\n" + "\n".join(evidence_lines) + "\n\n"
+
+    return f"""# {did}: {name}
 
 ## Metadata
 
@@ -725,7 +595,7 @@ def spec_md(row: dict, clients: list[tuple[str, str, str]]) -> str:
 
 - **Team:** {team}
 - **Leader:** {leader}
-- **Rationale:** {team_rationale}
+- **Rationale from intake fields:** {team_rationale}
 {assign_note}
 
 ## Summary
@@ -734,66 +604,61 @@ def spec_md(row: dict, clients: list[tuple[str, str, str]]) -> str:
 
 ## Reproduction / symptoms
 
-{bug if bug else "*(No description in export.)*"}
+{repro_text}
 
-## Root cause (hypothesis)
+## Known facts from intake
 
-{hypothesis_bullet}- **Product context (user manual):** {um}
-- **Code hotspots (seed):**
+- **Issue title:** {name}
+- **Source narrative:** captured from Monday export (Bug Description / Days until Resolution).
+- **Module (CSV):** {module if module else "(not provided)"}
+- **Environment (CSV):** {row.get("Environment", "").strip() if row.get("Environment", "").strip() else "(not provided)"}
+- **Current lifecycle note:** {status_note}
 
+## Investigation inputs (seed, not conclusions)
+
+- **Product context (candidate manuals):**
+{um if um.startswith("- ") else f"- {um}"}
+- **Code hotspots (candidate files):**
 {hotspots}
 
-## Competing hypotheses
+## Investigation checklist
 
-{hypo_md}
+- Reproduce once with tenant/user/date-range from PI (or note explicit gaps).
+- Capture request/response payload and at least one screenshot/PDF proving actual behavior.
+- Identify first divergence point (UI state, API payload, DB row, or export renderer).
+- Record confirmed root cause with concrete evidence before proposing code changes.
 
-## Fast elimination plan
+## Proposed fix approach
 
-{fast_checks}
-
-## Proposed fix (behavior-level)
-
-1. Reproduce under controlled data (entity/account/security from PI).
-2. Trace the failing layer (ingestion vs. UI vs. report engine) using hotspots above.
-3. Implement the smallest change that restores documented behavior (or approved new behavior); avoid scope creep.
-4. Add or extend automated tests where the **test plan** maps to existing frameworks (`controller/unittest/`, `dashboard/**/*.spec.ts`).
-
-## Fix options
-
-{options_md}
-
-## Impact / blast radius
-
-- Depends on subsystem: feeds may affect many tenants; UI bugs are often localized; report/valuation changes can affect compliance reporting — assess per area after root-cause confirmation.
-
-## Risks / rollback
-
-- Feature-flag or config toggles if available; otherwise revert commit and re-run regression suite for the touched module.
+- Apply the smallest patch at the first confirmed divergence point.
+- Add targeted regression coverage in the touched layer (UI/API/service).
+- Keep blast radius notes specific to changed modules/classes.
+- Rollback path: revert patch and rerun affected regression set.
 
 ## Acceptance criteria
 
 - PI symptoms no longer reproduce on **HC UAT** (or agreed environment) with agreed test data.
-- No regressions in adjacent flows listed in `pi/test-plans/{iid}.md`.
-- If behavior aligns to user manual, manual steps in the cited guide succeed end-to-end.
+- Root cause and fix are both backed by concrete evidence (payloads/logs/screenshots).
+- No regressions in adjacent flows listed in `pi/test-plans/{did}.md`.
 
-## Open questions
+{evidence_block}## Open questions
 
-- Tenant confirmation if **Client environment URL** was fuzzy or unmatched.
-- Whether provider-side (Electra, Morningstar, Bill.com, etc.) vs. AV defect — some PIs explicitly ask for vendor escalation.
+- Is this confirmed AV defect vs provider/data issue?
+- Which exact account/entity/date range is the acceptance baseline?
 """
 
 
-def test_plan_md(iid: str, name: str) -> str:
-    return f"""# Test plan: {iid}
+def test_plan_md(doc_id: str, name: str) -> str:
+    return f"""# Test plan: {doc_id}
 
 ## Scope and references
 
-- Fix spec: `pi/specs/{iid}.md`
+- Fix spec: `pi/specs/{doc_id}.md`
 - User manual: see spec **Root cause** / `pi/user_manual/README.md` for theme index.
 
 ## Code hotspots
 
-(See `pi/specs/{iid}.md` — **Code hotspots (seed)**; refine during dev.)
+(See `pi/specs/{doc_id}.md` — **Investigation inputs (seed, not conclusions)**; refine during dev.)
 
 ## Environment / data prerequisites
 
@@ -805,16 +670,17 @@ def test_plan_md(iid: str, name: str) -> str:
 
 | # | Objective | Steps | Expected |
 |---|------------|-------|----------|
-| 1 | Primary symptom gone | Follow spec **Reproduction** inversely: setup → execute flow → observe | Matches **Acceptance criteria** in spec |
-| 2 | Data integrity | Spot-check DB or export where PI references counts/amounts | Matches statements/feeds or business expectation |
+| 1 | Primary symptom gone | Reproduce the original PI path on HC UAT with same data | Symptom no longer occurs |
+| 2 | Evidence-backed behavior | Compare payload/log/screenshot before vs after fix | Divergence is removed at confirmed root cause point |
+| 3 | Data integrity | Spot-check persisted rows and exported/rendered output | Data and output remain consistent |
 
 ## Regression
 
 | Area | Code / UX anchor | Notes |
 |------|------------------|-------|
-| Same module (happy path) | Paths in `pi/specs/{iid}.md` hotspots | Smoke core navigation |
-| Adjacent feed/report | `controller/app/modules/reports/controllers/IndexController.php` or `dashboard/src/app/asset-vantage/dashboard/` as applicable | If PI touched reports or widgets |
-| Ledger / holdings | `controller/app/common/transaction/` relevant transaction class | If PI touched posting |
+| Same module (happy path) | Touched files from implementation PR | Run happy-path smoke checks |
+| Adjacent flow | Neighbor feature using shared method/component | Validate no behavior drift |
+| Export/report parity | If PI affects report/PDF/widgets | Verify UI view and exported output match |
 
 ## Adjacent
 
@@ -824,10 +690,10 @@ def test_plan_md(iid: str, name: str) -> str:
 
 | Layer | Framework / location | Existing coverage | Gap |
 |-------|----------------------|-------------------|-----|
-| PHP (controller) | PHPUnit under `controller/unittest/` (`tests/DateCalculationHelperTest.php` present) | Minimal sample tests | Add targeted tests if pure logic extracted; else API/integration per team practice |
-| Angular (dashboard) | Karma + Jasmine; `dashboard/karma.conf.js`; `dashboard/src/app/**/*.spec.ts` (46+ spec files) | Widget/dashboard specs exist | Extend closest `*.spec.ts` if UI logic fix |
-| Python (av-edge-api) | Routes under `av-edge-api/app/` | Benchmark routes active on `master` | Add tests if changing `alpha_wrt_benchmark` |
-| Lambdas | `av_v3_lambda/` | Repo-specific | Add handler tests if feed/sync logic changes |
+| PHP (controller) | PHPUnit under `controller/unittest/` | Existing tests vary by module | Add focused unit/integration for changed service/controller |
+| Angular (dashboard) | Karma/Jasmine under `dashboard/src/app/**/*.spec.ts` | Existing coverage varies by feature | Extend nearest spec for changed component/service |
+| Python (av-edge-api) | Tests near `av-edge-api/app/` routes/services | Route coverage varies | Add API/service tests if backend path changed |
+| Lambdas | Tests under `av_v3_lambda/` (if touched) | Function-specific | Add handler-level regression only for touched lambda |
 
 **Manual-only rationale (if applicable):** End-to-end feed or Electra provider parity may require manual compare to custodian files when no stable mock exists.
 """
@@ -859,13 +725,14 @@ def main() -> None:
     with csv_path.open(newline="", encoding="utf-8-sig", errors="replace") as f:
         reader = csv.DictReader(f)
         for row in reader:
+            did = doc_key(row)
             iid = (row.get("ITEM ID") or row.get("Item ID") or "").strip()
-            if not iid:
+            if not did:
                 continue
             name = row.get("Name", "").strip()
-            (SPECS / f"{iid}.md").write_text(spec_md(row, clients), encoding="utf-8")
-            (PLANS / f"{iid}.md").write_text(test_plan_md(iid, name), encoding="utf-8")
-            print("wrote", iid)
+            (SPECS / f"{did}.md").write_text(spec_md(row, clients), encoding="utf-8")
+            (PLANS / f"{did}.md").write_text(test_plan_md(did, name), encoding="utf-8")
+            print("wrote", did, "(item:", iid or "n/a", ")")
 
     if not args.no_move and csv_path.resolve() == INPUT_CSV.resolve():
         proc = ROOT / "input" / "processed"
