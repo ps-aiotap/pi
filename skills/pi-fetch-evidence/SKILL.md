@@ -10,7 +10,7 @@ description: >-
 
 ## Location in repo
 
-Stored under `pi/skills/pi-fetch-evidence/`. Symlink or copy to `.cursor/skills/pi-fetch-evidence` at the workspace root for Cursor Agent Skill discovery.
+Stored under `pi/skills/pi-fetch-evidence/`. Symlink only (no copy) to `.cursor/skills/pi-fetch-evidence` — see `pi/docs/pi-skills-catalog.md` § Skill discovery.
 
 ## Goal
 
@@ -64,6 +64,6 @@ Included file types by default: images, video, CSV, Excel, PDF, Office docs, tex
 
 ## Relationship to other PI skills
 
-- Runs **before** **`pi-evidence-analysis`**.
-- **`pi-intake-impact-fix-spec`** may reference evidence zip only after this step (or after verified existing zip).
+- Runs **before** **`pi-evidence-analysis`** — fetch alone is **not** complete; the next skill must open files and write `pi/evidence-analysis/{KEY}.md`.
+- **`pi-intake-impact-fix-spec`** and **`pi-daily-deep-dive`** must run analysis after this step whenever a zip exists (content-level findings, not inventory).
 - Implementation: `jira/scripts/jira_automation/fetch_evidence.py`

@@ -90,6 +90,10 @@ Do not treat the user manual as a substitute for the mandatory **repository sear
 4. If the file still has the batch **Draft (batch-generated)** callout, remove it once regression and automation sections meet the rules above.
 5. Do not write or edit executable test code here—that belongs to the `pi-test-implement` skill later.
 
+## Post-close (fixed PI)
+
+Intake plans stay as **hypothesis**. After Close + Dev RCA + Leakage RCA on Jira, run **`pi-test-plan-reconcile`** — it appends `## Post-RCA (confirmed)` and `### Cross-cutting prevention` without deleting intake sections. The daily **`pi-daily-executive-preventability`** report links to those anchors; do not duplicate confirmed cases here at intake time.
+
 ## Test plan section checklist
 
 - Scope and references (link to `pi/specs/{ItemId}.md`; summarize **`## Cross-cutting impact matrix`** `in-scope` dimensions; list relevant **`pi/user_manual/*.md`** when they define expected behavior for manual cases). If you paste the **HC UAT** URL from the spec, keep the spec’s **markdown link** syntax so it stays clickable.

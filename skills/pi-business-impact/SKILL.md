@@ -10,7 +10,7 @@ description: >-
 
 ## Location in repo
 
-Stored under `pi/skills/pi-business-impact/`. Symlink or copy to `.cursor/skills/pi-business-impact` at the workspace root for Cursor Agent Skill discovery.
+Stored under `pi/skills/pi-business-impact/`. Symlink only (no copy) to `.cursor/skills/pi-business-impact` — see `pi/docs/pi-skills-catalog.md` § Skill discovery.
 
 ## Goal
 
@@ -43,7 +43,7 @@ When skipped, do not create placeholder files; optionally note in `pi/docs/proce
 2. `pi/docs/pi-pipeline-config.md` (skip if disabled)
 3. `pi/docs/jira-pi-board-status.md` (status/column labels)
 4. If present: `pi/similar/{ItemId}.md` (Strong/Related rows for business recurrence)
-5. If present: `pi/evidence-analysis/{ItemId}.md` or evidence findings in spec
+5. If present: `pi/evidence-analysis/{ItemId}.md` — use **symptom anchors / extracted tokens**, not just the link. If a zip exists but analysis is missing or boilerplate, run **`pi-evidence-analysis`** first.
 6. Skim `pi/user_manual/` / `pi/user_manual/av_overview.md` for domain terms only — inline short definitions in output; do not require the reader to open manuals
 
 ## Inputs and outputs
@@ -76,7 +76,7 @@ Edit only under `pi/`. Do not modify application code.
 
 ## Who is affected
 - Client / entity (from spec)
-- Roles: ops, advisor, tax, client-facing — pick what fits
+- AV RBAC: Admin and/or non-Admin User Access Profiles with relevant module permissions (view/edit/export) — use AV module display names from Settings → User Access Profile; do not use job titles or made-up roles
 
 ## Business process at risk
 (What workflow is blocked or misleading: month-end, client report pack, tax filing, reconciliation, audit.)

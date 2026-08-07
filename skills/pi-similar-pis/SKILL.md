@@ -10,7 +10,7 @@ description: >-
 
 ## Location in repo
 
-Stored under `pi/skills/pi-similar-pis/`. Symlink or copy to `.cursor/skills/pi-similar-pis` at the workspace root for Cursor Agent Skill discovery.
+Stored under `pi/skills/pi-similar-pis/`. Symlink only (no copy) to `.cursor/skills/pi-similar-pis` — see `pi/docs/pi-skills-catalog.md` § Skill discovery.
 
 ## Goal
 
