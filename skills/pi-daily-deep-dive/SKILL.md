@@ -29,17 +29,31 @@ Purpose: **personal / lead understanding** (boss coaching ritual) — not thin t
 
 | Item | Value |
 | --- | --- |
-| Run at | **10:04 AM IST** (`Asia/Kolkata`) |
-| Cadence | **Weekdays** (`Mon–Fri`) |
-| Cron job id | `pi-daily-deep-dive` |
-| Cron does | Bitbucket refresh + write queue (`daily-deep-dive-queue.md`) with up to **5** IN DEVELOPMENT keys |
-| Agent does | Chat `pi-daily-deep-dive` (with queued keys) → deep MDs + **`pi-cr-candidate`** |
+| Run at | **10:00 AM IST** (`Asia/Kolkata`) — via weekday **`pi-hourly-ops`** |
+| Cadence | **Weekdays** (`Mon–Fri`), once per IST day |
+| Cron job id | `pi-hourly-ops` (matrix skill `pi-daily-deep-dive`) |
+| Cron does | Shared clone refresh + emit agent prompt under `cron/state/prompts/` |
+| Agent does | Chat `pi-daily-deep-dive` → deep MDs + **`pi-cr-candidate`** |
+
+Hourly matrix: `cron/config/hourly-skill-matrix.json` (10:00 pack also includes open analysis, detail elaboration, non-eng disposition, stale reminder).
+
+**Skip if already done today:** hourly ops checks artifacts before emitting a prompt:
 
 ```bash
-open "current/pi/Run PI Daily Deep Dive.command"
-# or:
-./cron/run-job.sh run pi-daily-deep-dive manual
-# then chat (keys from queue):
+./cron/scripts/skill-already-done.py pi-daily-deep-dive   # exit 0 = skip
+```
+
+Done when `pi/reports/daily-deep-dive-YYYY-MM-DD.md` exists, or `pi/ops/daily-deep-dive-state.json` already has today’s `runs` entry.
+
+```bash
+# Preferred — part of hourly ops (fires deep-dive at IST hour 10 only if not done)
+./cron/run-job.sh run pi-hourly-ops manual
+HOUR_OVERRIDE=10 ./cron/runners/pi-hourly-ops.sh
+
+# Prompt only
+./cron/scripts/build-skill-prompt.sh pi-daily-deep-dive
+
+# then chat (keys from queue or auto-select):
 pi-daily-deep-dive PB-a PB-b PB-c PB-d PB-e
 ```
 

@@ -1,37 +1,49 @@
 ---
 name: pi-test-implement
 description: >-
-  Future phase: implements automated or scripted tests from pi/test-plans/ for a
-  given ItemId, using pi/user_manual/ when UI or flow assertions need documented
-  labels and steps. Run only after the test plan is approved.
+  Implements verify-the-fix Playwright from pi/test-plans/ for a given ItemId
+  under dashboard/tests/e2e/pi/. Does not implement prevention regression list
+  (PM Tasks). Run after test plan exists and code fix is on branch.
 ---
 
-# PI test implementation (future use)
+# PI test implementation (verify-the-fix Playwright)
 
 ## Location in repo
 
-`pi/skills/`. Symlink to `.cursor/skills/pi-test-implement` when you enable this phase.
+`pi/skills/`. Symlink to `.cursor/skills/pi-test-implement`.
 
 ## Preconditions
 
-- **Jira status:** Read **`pi/docs/jira-pi-board-status.md`**. Tests prove the **PI defect** scope; **BA (Change Request)** does not require automating follow-on feature requests unless the approved plan says so.
-- **No placeholder refs:** Test plans and assertions must reference real paths (`rg`/glob verified). Do not leave **TBD** automation rows or cite evidence zips that are not in the workspace.
-- **Path discipline (mandatory):** Do **not** use `@PI`, `@pi`, `@old_pi`, or alias-style folder shorthand in test evidence. Use direct file paths defined in this skill and plan/spec inputs (for example `pi/test-plans/{ItemId}.md`, `pi/specs/{ItemId}.md`, `pi/user_manual/...`, and concrete test/code paths).
-- **PI special cases context (mandatory):** Read `pi/docs/pi-special-cases.md` before implementing tests. When applicable, add coverage for the nuance-specific behavior and the expected client remediation path documented in the spec/test plan.
-- **Source code refresh (Bitbucket):** Same as **`pi-code-fix`**: **workspace root** holds `pi/` (GitHub PI repo — **exclude** from this refresh) and **multiple Bitbucket clones**. In **every** application clone (`find "$WORKSPACE_ROOT" -name .git -type d | grep -v '/pi/'`): `git fetch --prune`, `git checkout master`, then pull/merge **`origin/master`** into **`master`** so the working tree is current. If **any** repo cannot be synced safely, **stop** and get human direction.
-- `pi/test-plans/{ItemId}.md` exists and is **approved**.
-- Application fix (if any) is merged or available on the branch under test.
+- **Jira status:** Read **`pi/docs/jira-pi-board-status.md`**. Tests prove the **PI defect** scope only.
+- **No placeholder refs:** Test plans and assertions must reference real paths (`rg`/glob verified).
+- **Path discipline (mandatory):** Use direct file paths (e.g. `pi/test-plans/{ItemId}.md`, `dashboard/tests/e2e/pi/{ItemId}/`).
+- **PI special cases context (mandatory):** Read `pi/docs/pi-special-cases.md` before implementing tests.
+- **Source code refresh (Bitbucket):** Same as **`pi-code-fix`** — refresh every app clone except `pi/` on `master` before authoring tests.
+- `pi/test-plans/{ItemId}.md` exists with **Verify the fix** and **Prevention regression tests (future PIs)** sections.
+- Application fix is on the working branch under test.
 
-## User manual
+## Scope
 
-When the test plan references **`pi/user_manual/*.md`** or covers UI flows, **open those guides** (and **`pi/user_manual/README.md`** to find related topics) so assertions use **documented** menu paths, field labels, and expected outcomes—reducing brittle guesses. If the guide and the app UI diverge, align tests to **approved spec** and note the doc drift in chat or the test plan follow-up. Search: `rg -l "phrase" pi/user_manual` from repo root.
+| In scope | Out of scope |
+|----------|--------------|
+| **Verify the fix** rows → Playwright under `dashboard/tests/e2e/pi/{ItemId}/` | **Prevention regression tests (future PIs)** → PM Tasks only |
+| PHPUnit for backend-only verify rows when no UI | Org-wide avautomation suite expansion |
+| Tag files with `// PI: {ItemId}` | PR creation |
 
-## Instructions (when activated)
+Prefer **`/test-generation-agent`** with Playwright forced (see `.cursor/prompts/workflow/04-test-generation-agent.md` PI fix loop prompt).
 
-1. Read `pi/test-plans/{ItemId}.md` and the corresponding `pi/specs/{ItemId}.md` (including **`## Cross-cutting impact matrix`** — implement coverage for each `in-scope` row reflected in the plan).
-2. For manual-test anchors or UI coverage, cross-check cited **`pi/user_manual/`** files (and supplement via README index + ripgrep if the plan is thin).
-3. Add or extend tests in the **appropriate** test tree for this repo (discover via existing tests and CI). Prefer the framework already in use.
-4. Keep tests focused: prove acceptance criteria and critical regressions first.
-5. Run the relevant test command if available and fix failures tied to the new tests.
+## Instructions
 
-This skill stays minimal until you begin automated test authoring.
+1. Read `pi/test-plans/{ItemId}.md` and `pi/specs/{ItemId}.md` — implement **Verify the fix** only.
+2. Write Playwright under `dashboard/tests/e2e/pi/{ItemId}/` following `dashboard/tests/e2e/balance-sheet*.spec.ts` patterns.
+3. Each spec file: header `// PI: {ItemId}`.
+4. Run `cd dashboard && npx playwright test tests/e2e/pi/{ItemId}` when environment allows; note blockers in handoff.
+5. Do **not** implement rows under **Prevention regression tests (future PIs)** — orchestrator creates PM Tasks from that list.
+
+## Handoff fields
+
+Record in `pi/ops/drafts/fix-handoff-{ItemId}.md`:
+
+- Playwright paths created
+- Run command
+- Pass/fail or environment blocker

@@ -83,10 +83,11 @@ Do not treat the user manual as a substitute for the mandatory **repository sear
    Use findings to fill **Automation mapping** with **concrete** framework names, file paths, or globs.
 3. Write or update **`pi/test-plans/{ItemId}.md`** including:
    - **Code hotspots:** Table or bullets tying the PI to controllers, services, SQL, or UI entry points (start from spec + batch **Code hotspots (seed)** if present).
-   - **Verify the fix:** cases that directly prove the PI is resolved (steps, data, expected result).
-   - **Regression:** Each row must cite a **Code / UX anchor** (file::symbol, route, or screen), not generic “smoke module” text.
+   - **Verify the fix:** cases that directly prove the PI is resolved (steps, data, expected result). These become **executable Playwright** on the source PI under `dashboard/tests/e2e/pi/{ItemId}/` — document target path in **Automation mapping**.
+   - **Prevention regression tests (future PIs):** concrete list of tests to add so **similar PIs do not recur** — title, intent, steps, code/UX anchor, suggested suite (`dashboard/tests/e2e/...` and/or `avautomation`). Ground in similar-PIs + Cross-cutting matrix. **Do not** treat this section as verify-this-fix; implementation is **PM Tasks** on board 1144.
+   - **Regression:** Each row must cite a **Code / UX anchor** (file::symbol, route, or screen), not generic “smoke module” text. Prefer folding recurrence intent into **Prevention regression tests** when the goal is stopping future PIs.
    - **Adjacent:** Only flows justified by impact analysis, **`## Cross-cutting impact matrix`** `in-scope` rows, or shared code.
-   - **Automation mapping:** A table (or explicit “manual-only” with rationale). **Do not** leave the word **TBD** as the answer when the spec names `controller/` or other repo paths — either list matching tests/globs or state that no tests reference those paths after the search.
+   - **Automation mapping:** A table (or explicit “manual-only” with rationale). **Do not** leave the word **TBD** as the answer when the spec names `controller/` or other repo paths — either list matching tests/globs or state that no tests reference those paths after the search. Include row for **verify Playwright** target path.
 4. If the file still has the batch **Draft (batch-generated)** callout, remove it once regression and automation sections meet the rules above.
 5. Do not write or edit executable test code here—that belongs to the `pi-test-implement` skill later.
 
@@ -100,6 +101,8 @@ Intake plans stay as **hypothesis**. After Close + Dev RCA + Leakage RCA on Jira
 - Code hotspots (spec- and repo-grounded)
 - Environment / data prerequisites
 - Test cases with steps and expected results
+- **Verify the fix** (maps to Playwright on source PI)
+- **Prevention regression tests (future PIs)** (maps to PM Tasks — not source-branch implementation)
 - Regression table with **Code / UX anchor** per row
 - Adjacent-area cases (trim irrelevant defaults)
 - Automation mapping: frameworks + what exists vs gap (**no lazy TBD**)
