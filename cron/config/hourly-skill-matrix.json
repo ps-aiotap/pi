@@ -1,0 +1,83 @@
+{
+  "_comment": "IST hour → skills. Intake/deep-analysis skills skip when artifacts already exist (skill-already-done.py). Assign-engineering-queue then fix-loop every hour 09-18.",
+  "timezone": "Asia/Kolkata",
+  "hours": {
+    "09": ["pi-assign-engineering-queue", "pi-sdlc-fix-loop"],
+    "10": [
+      "pi-assign-engineering-queue",
+      "pi-sdlc-fix-loop",
+      "pi-daily-open-analysis",
+      "pi-daily-deep-dive",
+      "pi-detail-elaboration",
+      "pi-non-eng-disposition",
+      "pi-stale-assignee-reminder"
+    ],
+    "11": ["pi-assign-engineering-queue", "pi-sdlc-fix-loop", "pi-meeting-brief"],
+    "12": ["pi-assign-engineering-queue", "pi-sdlc-fix-loop"],
+    "13": ["pi-assign-engineering-queue", "pi-sdlc-fix-loop"],
+    "14": ["pi-assign-engineering-queue", "pi-sdlc-fix-loop"],
+    "15": ["pi-assign-engineering-queue", "pi-sdlc-fix-loop"],
+    "16": ["pi-assign-engineering-queue", "pi-sdlc-fix-loop"],
+    "17": ["pi-assign-engineering-queue", "pi-sdlc-fix-loop"],
+    "18": ["pi-assign-engineering-queue", "pi-sdlc-fix-loop"]
+  },
+  "skills": {
+    "pi-assign-engineering-queue": {
+      "kind": "agent_prompt",
+      "skill": "@pi/skills/pi-assign-engineering-queue/SKILL.md",
+      "chat": "pi-assign-engineering-queue",
+      "skip_if_done": false,
+      "once_per_day": false,
+      "notes": "Before fix-loop each hour: assign Developer+Team on In Engineering Queue (In Review) PIs missing both fields, then move to IN DEVELOPMENT. Idempotent; skips already-assigned."
+    },
+    "pi-sdlc-fix-loop": {
+      "kind": "fix_loop",
+      "skill": "@pi/skills/pi-sdlc-fix-loop/SKILL.md",
+      "skip_if_done": false,
+      "once_per_day": false
+    },
+    "pi-daily-deep-dive": {
+      "kind": "agent_prompt",
+      "skill": "@pi/skills/pi-daily-deep-dive/SKILL.md",
+      "chat": "pi-daily-deep-dive",
+      "skip_if_done": true,
+      "once_per_day": true,
+      "notes": "Skip if pi/reports/daily-deep-dive-YYYY-MM-DD.md or state runs already has today. Up to 5 IN DEVELOPMENT keys; never write Jira."
+    },
+    "pi-daily-open-analysis": {
+      "kind": "agent_prompt",
+      "skill": "@pi/skills/pi-daily-open-analysis/SKILL.md",
+      "chat": "pi-daily-open-analysis",
+      "skip_if_done": true,
+      "once_per_day": true
+    },
+    "pi-detail-elaboration": {
+      "kind": "agent_prompt",
+      "skill": "@pi/skills/pi-detail-elaboration/SKILL.md",
+      "chat": "pi-detail-elaboration",
+      "skip_if_done": true,
+      "once_per_day": true
+    },
+    "pi-non-eng-disposition": {
+      "kind": "agent_prompt",
+      "skill": "@pi/skills/pi-non-eng-disposition/SKILL.md",
+      "chat": "pi-non-eng-disposition",
+      "skip_if_done": true,
+      "once_per_day": true
+    },
+    "pi-stale-assignee-reminder": {
+      "kind": "agent_prompt",
+      "skill": "@pi/skills/pi-stale-assignee-reminder/SKILL.md",
+      "chat": "pi-stale-assignee-reminder",
+      "skip_if_done": true,
+      "once_per_day": true
+    },
+    "pi-meeting-brief": {
+      "kind": "agent_prompt",
+      "skill": "@pi/skills/pi-meeting-brief/SKILL.md",
+      "chat": "pi-meeting-brief",
+      "skip_if_done": true,
+      "once_per_day": true
+    }
+  }
+}

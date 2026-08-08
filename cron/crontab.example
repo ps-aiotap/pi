@@ -1,0 +1,15 @@
+# PI cron jobs (Asia/Kolkata)
+# Install: crontab cron/crontab.example
+# Manual: ./cron/run-job.sh run <job-id> manual
+
+SHELL=/bin/bash
+CRON_TZ=Asia/Kolkata
+WORKSPACE_ROOT=/var/www/sourcecode
+
+# Hourly weekday PI ops (09:00–18:00 IST): assign-engineering-queue + fix-loop
+# + hour-matched analysis skills (deep dive, open analysis, etc. — see matrix)
+# CRON_TZ required: host clock is UTC; without it 9-18 would be UTC not IST.
+0 9-18 * * 1-5 cd /var/www/sourcecode && ./cron/run-job.sh run pi-hourly-ops cron >> /var/www/sourcecode/cron/logs/pi-hourly-ops.log 2>&1
+
+# Stage 2 (future — disabled until pi-playwright-fix-audit runner exists)
+# 15 9-18 * * 1-5 cd /var/www/sourcecode && ./cron/run-job.sh run pi-playwright-fix-audit cron >> /var/www/sourcecode/cron/logs/pi-playwright-fix-audit.log 2>&1

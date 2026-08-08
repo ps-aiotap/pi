@@ -59,7 +59,7 @@ Hourly umbrella (`pi-hourly-ops`) runs **`pi-assign-engineering-queue`** first (
   "current_key": null,
   "entries": {
     "PB-xxxx": {
-      "status": "in_flight|awaiting_human_pr|awaiting_audit|blocked|done",
+      "status": "in_flight|awaiting_human_pr|awaiting_audit|blocked|done|trashed",
       "branch": "bugfix/PB-xxxx-...",
       "prevention_pm": ["PM-nnn"],
       "playwright_paths": ["dashboard/tests/e2e/pi/PB-xxxx.verify-fix.spec.ts"],
@@ -70,7 +70,7 @@ Hourly umbrella (`pi-hourly-ops`) runs **`pi-assign-engineering-queue`** first (
 }
 ```
 
-Skip keys already in `in_flight`, `awaiting_human_pr`, `awaiting_audit`, or `done`.
+Skip keys already in `in_flight`, `awaiting_human_pr`, `awaiting_audit`, `done`, `blocked`, or `trashed`.
 
 ## Agent workflow (one PI)
 
@@ -117,6 +117,12 @@ Do not create PR.
 
 Or: `Run the skill @pi/skills/pi-code-fix/SKILL.md {KEY}` when enabled.
 
+**Hard rules (master hygiene):**
+
+- All product + Playwright edits stay on `bugfix/{KEY}-...` only.
+- Never leave uncommitted files on `dashboard`/`controller` **master** (that aborts `refresh-app-clones.sh` for the next cron hour).
+- Before ending the hour: `git -C /var/www/dashboard status --porcelain` and same for other app clones must be empty while on `master`.
+
 ### 3. Verify-the-fix Playwright
 
 ```
@@ -124,12 +130,21 @@ Or: `Run the skill @pi/skills/pi-code-fix/SKILL.md {KEY}` when enabled.
 
 Generate verify-the-fix Playwright for {KEY}.
 Read pi/test-plans/{KEY}.md Verify the fix only.
-Write dashboard/tests/e2e/pi/{KEY}/ with // PI: {KEY} header.
+Write ONLY on branch bugfix/{KEY}-... under dashboard/tests/e2e/pi/{KEY}/ with // PI: {KEY} header.
 Do not implement Prevention regression tests (future PIs).
-Run: cd dashboard && npx playwright test tests/e2e/pi/{KEY} (note blockers).
+Do NOT write or leave Playwright files on master.
+Run: cd dashboard && npx playwright test tests/e2e/pi/{KEY}
 ```
 
 See `.cursor/prompts/workflow/04-test-generation-agent.md` PI fix loop block.
+
+**Gate before handoff:**
+
+| Outcome | State status | Notes |
+| --- | --- | --- |
+| `npx playwright test ...` ran and passed | may set `awaiting_human_pr` | Specs remain on bugfix branch only |
+| UAT/env missing or test cannot run | set `blocked` with reason | Do **not** invent `awaiting_human_pr` or leave `test.fixme` stubs on master |
+| Tests failing after fix | keep `in_flight` or `blocked` | Fix code or note blocker; never check in unverified specs to master |
 
 ### 4. Prevention regression list
 
@@ -153,6 +168,8 @@ Use Atlassian MCP `createJiraIssue` + `createIssueLink`, or draft `pi/ops/drafts
 
 ### 6. Stop — handoff
 
+Only after verify Playwright has **actually been run** (pass → handoff; cannot run → `blocked`).
+
 Write **`pi/ops/drafts/fix-handoff-{KEY}.md`**:
 
 ```markdown
@@ -160,15 +177,22 @@ Write **`pi/ops/drafts/fix-handoff-{KEY}.md`**:
 
 **Status:** awaiting_human_pr
 **Branch:** bugfix/{KEY}-...
-**Playwright:** dashboard/tests/e2e/pi/{KEY}/...
-**Run:** cd dashboard && npx playwright test tests/e2e/pi/{KEY}
+**Playwright:** dashboard/tests/e2e/pi/{KEY}/... (on bugfix branch only)
+**Playwright result:** PASSED (paste command + summary)
+**Run:** cd dashboard && git checkout bugfix/{KEY}-... && npx playwright test tests/e2e/pi/{KEY}
 **Prevention PM:** PM-nnn, PM-nnn
 **Prevention list:** (summary bullets)
 **Next:** Human inspects diff + Playwright; open Bitbucket PR when ready.
-**Do not:** auto-merge, auto-close Jira, implement prevention list on this branch.
+**Do not:** auto-merge, auto-close Jira, implement prevention list on this branch, leave master dirty.
 ```
 
-Update `cron/state/pi-sdlc-fix-loop.json` → `awaiting_human_pr`.
+Update `cron/state/pi-sdlc-fix-loop.json` → `awaiting_human_pr` **only if Playwright passed**. Otherwise → `blocked`.
+
+### 7. End-of-hour hygiene
+
+1. Checkout `master` on each app clone touched.
+2. Discard/stash any accidental master dirt so `./cron/scripts/refresh-app-clones.sh` succeeds next hour.
+3. Confirm `git status --porcelain` is empty on master.
 
 ## Paths
 
