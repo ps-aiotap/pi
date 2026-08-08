@@ -20,9 +20,10 @@ To turn off business impact for a run, set `business_impact: false` or comment o
 
 Per-PI override: human can say in chat *"skip business impact for this PI"* — that overrides the file for one run only.
 
-**Related (not gated here):** on-demand **`pi-assign-engineering-queue`** auto-assigns Developer + Team on **In Engineering Queue** PIs missing both fields, then moves them to IN DEVELOPMENT. This is separate from intake's suggest-only path (`assign_developer_apply`).
+**Related (not gated here):** **`pi-assign-engineering-queue`** auto-assigns Developer + Team on **In Engineering Queue** PIs missing both fields, then moves them to IN DEVELOPMENT. Scheduled hourly via **`pi-hourly-ops`** (before `pi-sdlc-fix-loop`). Separate from intake's suggest-only path (`assign_developer_apply`).
 
 ```bash
 cd jira && python -m scripts.jira_automation assign-engineering-queue --dry-run
 cd jira && python -m scripts.jira_automation assign-engineering-queue
+# Or: ./cron/run-job.sh run pi-hourly-ops manual
 ```

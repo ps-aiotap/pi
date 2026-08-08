@@ -3,8 +3,8 @@ name: pi-assign-engineering-queue
 description: >-
   Auto-assigns Developer + Team on PB board-774 In Engineering Queue PIs that
   are missing both fields, then moves them to IN DEVELOPMENT. Uses
-  developer-domains.json rules. On-demand; supports --dry-run. Pair with
-  pi-developer-domain-learn for rule tuning.
+  developer-domains.json rules. Runs hourly via pi-hourly-ops before the fix
+  loop; supports --dry-run. Pair with pi-developer-domain-learn for rule tuning.
 ---
 
 # PI assign engineering queue (In Engineering → Development)
@@ -23,11 +23,16 @@ For **In Engineering Queue** only (`status = In Review` on board **774**):
 | Developer or Team already set | **Skip** (no overwrite) |
 | No domain match / low confidence / API error | **Skip** / report — do **not** transition |
 
-## When to run
+## Schedule (cron)
 
-- On demand: *"assign engineering queue"*, *"pi-assign-engineering-queue"*, *"assign In Engineering PIs"*
-- After tickets land in **In Engineering Queue** without Developer/Team
-- Prefer `--dry-run` first when unsure about domain coverage
+| Item | Value |
+| --- | --- |
+| Cron | `0 9-18 * * 1-5` (`Asia/Kolkata`) — every hour via **`pi-hourly-ops`**, **before** `pi-sdlc-fix-loop` |
+| Matrix | `cron/config/hourly-skill-matrix.json` |
+| Prompt builder | `cron/scripts/build-skill-prompt.sh pi-assign-engineering-queue` |
+| Chat | `pi-assign-engineering-queue` |
+
+Also on demand: *"assign engineering queue"*, *"assign In Engineering PIs"*. Prefer `--dry-run` when unsure about domain coverage.
 
 ## Prerequisites
 
