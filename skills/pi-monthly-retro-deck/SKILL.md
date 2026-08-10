@@ -26,11 +26,34 @@ Reproduce the April 2026 Retro2 v8 layout for the **prior month**, 8 slides:
 | 4 | Top Problem Themes — per engineering team (plain text) |
 | 5 | PI Root Causes — Dev RCA + Leakage RCA with real counts (plain text) |
 | 6 | Problem Management Actions — 6 commitments, auto-filled from metrics + carried forward |
-| 7 | Open Critical Watch List — Critical PIs open/in verification (plain text) |
+| 7 | Open Critical Watch List + **Red Clients roster** (see below) |
 | 8 | Month-over-Month Trends — prior vs report month |
 
 Charts, the OLE image, decorative formatting and slide numbers are stripped;
 slides 4–8 are plain readable text.
+
+### Slide 7 detail
+
+1. **Open Critical Watch List** — Critical / Business Critical PIs not Closed and
+   not Rejected/FNR (columns: PI ID, Status, Team, Issue).
+2. **Red clients (escalation roster)** — appended under the watch table. Loaded
+   at render time from [`pi/input/red-clients.csv`](../../../pi/input/red-clients.csv)
+   (columns `Red Clients`, `Leader`). Format: `Client — Leader`. Do not hardcode
+   client names in the skill or generator; edit the CSV to change the roster.
+
+Current roster (for sanity checks only — CSV is SoT):
+
+| Red client | Leader |
+| --- | --- |
+| Acadia | Anil |
+| Cohn Reznick | Anil |
+| Heritage Wealth | Anil |
+| Altium | Ravi |
+| TFB | Ravi |
+| Zeeco | Ravi |
+| Dayan | Sandip |
+| Michael Zusman | Sandip |
+| Mobo | Sandip |
 
 ## Incoming source of truth (mandatory)
 
@@ -54,6 +77,7 @@ slides 4–8 are plain readable text.
 | **Reopened** | status Reopen |
 | **Dev RCA / Leakage RCA** | `customfield_10935` / `customfield_11345`, bucketed for slides 5 & 8 |
 | **Watch list** | Critical PIs not Closed and not Rejected/FNR |
+| **Red clients (slide 7)** | Static escalation roster from `pi/input/red-clients.csv` (not a live open-PI filter) |
 
 ## When to run
 
